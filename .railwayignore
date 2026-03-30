@@ -1,0 +1,17 @@
+.git
+.gitignore
+.vscode
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+venv
+.env
+.DS_Store
+*.log
+README_DEPLOYMENT.md
+RAILWAY_DEPLOYMENT.md
+QUICK_START_RAILWAY.md
+DEPLOYMENT_CHECKLIST.md
+RAILWAY_DEPLOYMENT_SQLITE.md
+entrypoint.sh

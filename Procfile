@@ -1,1 +1,1 @@
-web: cd hrms && python manage.py collectstatic --noinput && python manage.py migrate && gunicorn hrms.wsgi
+web: gunicorn --pythonpath hrms hrms.wsgi
