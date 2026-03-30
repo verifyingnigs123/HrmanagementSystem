@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - HRMS{% endblock %}
+
+{% block content %}
+
+<!-- ===== ADMIN DASHBOARD ===== -->
+{% if role == 'admin' %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1>👨‍💼 Admin Dashboard</h1>
+        <p class="text-muted">Full System Control</p>
+    </div>
+</div>
+
+<!-- Key Metrics -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Employees</h5>
+                <h2>{{ total_employees }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Active Employees</h5>
+                <h2>{{ active_employees }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">System Users</h5>
+                <h2>4</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Departments</h5>
+                <h2>2</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Role Breakdown -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Role Distribution</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for role_item, count in role_counts.items %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ role_item }}</span>
+                        <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">System Management</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="/admin/" class="list-group-item list-group-item-action">
+                        <h6 class="mb-1">🔧 Django Admin Panel</h6>
+                        <p class="mb-0 small">Manage all system settings and users</p>
+                    </a>
+                    <a href="/admin/employees/employee/" class="list-group-item list-group-item-action">
+                        <h6 class="mb-1">👥 Manage Employees</h6>
+                        <p class="mb-0 small">View and edit employee records</p>
+                    </a>
+                    <a href="/admin/employees/role/" class="list-group-item list-group-item-action">
+                        <h6 class="mb-1">🔑 Manage Roles</h6>
+                        <p class="mb-0 small">Create and modify user roles</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <a href="{% url 'employee_list' %}" class="btn btn-primary btn-lg">
+            View All Employees
+        </a>
+    </div>
+</div>
+
+<!-- ===== HR ADMIN DASHBOARD ===== -->
+{% elif role == 'hradmin' %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1>👩‍💼 HR Admin Dashboard</h1>
+        <p class="text-muted">Manage Human Resources</p>
+    </div>
+</div>
+
+<!-- Key Metrics -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Employees</h5>
+                <h2>{{ total_employees }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Departments</h5>
+                <h2>{{ departments|length }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">New Hires This Month</h5>
+                <h2>{{ new_employees|length }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity & Departments -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Recent New Hires</h5>
+            </div>
+            <div class="card-body">
+                {% if new_employees %}
+                <ul class="list-group list-group-flush">
+                    {% for employee in new_employees %}
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ employee.user.first_name }} {{ employee.user.last_name }}</strong>
+                            <small class="text-muted">{{ employee.position }}</small>
+                        </div>
+                        <small>{{ employee.employee_id }} • {{ employee.department }}</small>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">No recent hires</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Departments</h5>
+            </div>
+            <div class="card-body">
+                {% if departments %}
+                <ul class="list-group list-group-flush">
+                    {% for dept in departments %}
+                    <li class="list-group-item">{{ dept }}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">No departments</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actions -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h5 class="mb-3">Quick Actions</h5>
+        <a href="{% url 'employee_list' %}" class="btn btn-primary">
+            👥 View All Employees
+        </a>
+        <a href="/admin/employees/employee/add/" class="btn btn-success">
+            ➕ Add New Employee
+        </a>
+        <a href="/admin/" class="btn btn-secondary">
+            ⚙️ System Settings
+        </a>
+    </div>
+</div>
+
+<!-- ===== MANAGER DASHBOARD ===== -->
+{% elif role == 'manager' %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1>👔 Manager Dashboard</h1>
+        <p class="text-muted">Manage Your Team</p>
+    </div>
+</div>
+
+<!-- Manager Info & Team Stats -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Department</h5>
+                <h2>{{ department }}</h2>
+                <p class="mb-0">Position: {{ position }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Team Members</h5>
+                <h2>{{ team_count }}</h2>
+                <p class="mb-0">Direct reports in {{ department }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Team Members List -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Your Team</h5>
+            </div>
+            <div class="card-body">
+                {% if team_members %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Employee ID</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in team_members %}
+                            <tr>
+                                <td><strong>{{ member.user.first_name }} {{ member.user.last_name }}</strong></td>
+                                <td>{{ member.employee_id }}</td>
+                                <td>{{ member.position }}</td>
+                                <td>
+                                    {% if member.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'employee_detail' member.id %}" class="btn btn-sm btn-info">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-4">No team members in your department</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <a href="{% url 'employee_list' %}" class="btn btn-primary">
+            View All Employees
+        </a>
+    </div>
+</div>
+
+<!-- ===== EMPLOYEE DASHBOARD ===== -->
+{% elif role == 'employee' %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1>👤 Employee Dashboard</h1>
+        <p class="text-muted">Your Profile & Information</p>
+    </div>
+</div>
+
+<!-- Employee Profile Card -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Profile Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Full Name</h6>
+                        <p>{{ employee.user.first_name }} {{ employee.user.last_name }}</p>
+                        
+                        <h6 class="text-muted mt-3">Employee ID</h6>
+                        <p><strong>{{ employee.employee_id }}</strong></p>
+                        
+                        <h6 class="text-muted mt-3">Department</h6>
+                        <p>{{ employee.department }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Position</h6>
+                        <p>{{ employee.position }}</p>
+                        
+                        <h6 class="text-muted mt-3">Email</h6>
+                        <p>{{ employee.user.email }}</p>
+                        
+                        <h6 class="text-muted mt-3">Phone</h6>
+                        <p>{{ employee.phone|default:"Not provided" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Status Card -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Status</h5>
+            </div>
+            <div class="card-body text-center">
+                {% if employee.is_active %}
+                <div class="alert alert-success mb-3">
+                    ✓ Active Employee
+                </div>
+                {% else %}
+                <div class="alert alert-danger mb-3">
+                    ✗ Inactive
+                </div>
+                {% endif %}
+                
+                <h6 class="text-muted mt-3">Hire Date</h6>
+                <p>{{ employee.hire_date|date:"M d, Y"|default:"Not provided" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Information -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Additional Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Date of Birth</h6>
+                        <p>{{ employee.date_of_birth|date:"M d, Y"|default:"Not provided" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Salary</h6>
+                        <p>{{ employee.salary|default:"Not provided" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <button class="btn btn-primary" disabled>
+            📝 Edit Profile (Coming Soon)
+        </button>
+        <button class="btn btn-secondary" disabled>
+            🔐 Change Password (Coming Soon)
+        </button>
+    </div>
+</div>
+
+{% else %}
+<div class="alert alert-warning">
+    <h4>Access Denied</h4>
+    <p>Your role is not recognized in the system.</p>
+</div>
+{% endif %}
+
+{% endblock %}

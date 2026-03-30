@@ -1,0 +1,217 @@
+{% if user.is_authenticated %}
+<style>
+    .sidebar {
+        background: white;
+        border-right: 1px solid #e0e0e0;
+        height: calc(100vh - 80px);
+        position: fixed;
+        left: 0;
+        top: 80px;
+        width: 250px;
+        padding: 30px 0;
+        overflow-y: auto;
+        z-index: 100;
+    }
+    
+    .sidebar-header {
+        padding: 0 20px 20px;
+        border-bottom: 1px solid #e0e0e0;
+        margin-bottom: 20px;
+    }
+    
+    .sidebar-header h6 {
+        color: #1a1a1a;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .sidebar-header small {
+        color: #999;
+    }
+    
+    .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .sidebar-menu li {
+        margin: 0;
+    }
+    
+    .sidebar-menu a {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: #333333;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+    
+    .sidebar-menu a:hover {
+        background-color: #f5f5f5;
+        color: #1a1a1a;
+        border-left-color: #1a1a1a;
+        padding-left: 22px;
+    }
+    
+    .sidebar-menu a i {
+        width: 20px;
+        margin-right: 15px;
+        text-align: center;
+    }
+    
+    .sidebar-section {
+        margin: 20px 0;
+        padding: 20px 0;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .sidebar-section:first-of-type {
+        margin-top: 0;
+        border-top: none;
+    }
+    
+    .sidebar-section-title {
+        padding: 10px 20px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #999;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+    
+    .main-content {
+        margin-left: 250px;
+    }
+    
+    .container-main {
+        width: 100%;
+    }
+    
+    /* Adjust footer when sidebar is present */
+    footer {
+        margin-left: 250px !important;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 200px;
+        }
+        
+        .main-content {
+            margin-left: 0;
+        }
+        
+        footer {
+            margin-left: 0 !important;
+        }
+    }
+</style>
+
+<div class="sidebar">
+    <!-- Sidebar Header -->
+    <div class="sidebar-header">
+        <h6>{{ user.first_name|default:user.username }}</h6>
+        <small>{{ user.employee.get_role_label }}</small>
+    </div>
+    
+    <!-- Admin Menu -->
+    {% if user.employee.role == 'admin' %}
+    <ul class="sidebar-menu">
+        <div class="sidebar-section-title">Dashboard</div>
+        <li><a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+    </ul>
+    
+    <ul class="sidebar-menu">
+        <div class="sidebar-section-title">System Management</div>
+        <li><a href="/admin/"><i class="fas fa-sliders-h"></i> Admin Panel</a></li>
+        <li><a href="{% url 'employee_list' %}"><i class="fas fa-users"></i> All Employees</a></li>
+        <li><a href="/admin/employees/employee/"><i class="fas fa-user-tie"></i> Manage Employees</a></li>
+        <li><a href="/admin/employees/role/"><i class="fas fa-key"></i> Manage Roles</a></li>
+    </ul>
+    
+    <ul class="sidebar-menu">
+        <div class="sidebar-section-title">Reports & Analytics</div>
+        <li><a href="#"><i class="fas fa-chart-bar"></i> System Reports</a></li>
+        <li><a href="#"><i class="fas fa-chart-pie"></i> Statistics</a></li>
+    </ul>
+    
+    <!-- HR Admin Menu -->
+    {% elif user.employee.role == 'hradmin' %}
+    <ul class="sidebar-menu">
+        <div class="sidebar-section-title">Dashboard</div>
+        <li><a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+    </ul>
+    
+    <ul class="sidebar-menu">
+        <div class="sidebar-section-title">Employee Management</div>
+        <li><a href="{% url 'employee_list' %}"><i class="fas fa-users"></i> All Employees</a></li>
+        <li><a href="/admin/employees/employee/add/"><i class="fas fa-user-plus"></i> Add Employee</a></li>
+        <li><a href="/admin/employees/employee/"><i class="fas fa-edit"></i> Manage Employees</a></li>
+    </ul>
+    
+    <ul class="sidebar-menu">
+        <div class="sidebar-section-title">HR Operations</div>
+        <li><a href="#"><i class="fas fa-file-contract"></i> Leave Requests</a></li>
+        <li><a href="#"><i class="fas fa-calendar"></i> Attendance</a></li>
+        <li><a href="#"><i class="fas fa-clock"></i> Payroll</a></li>
+    </ul>
+    
+    <ul class="sidebar-menu">
+        <div class="sidebar-section-title">Reports</div>
+        <li><a href="#"><i class="fas fa-chart-line"></i> HR Reports</a></li>
+        <li><a href="#"><i class="fas fa-chart-bar"></i> Employee Stats</a></li>
+    </ul>
+    
+    <!-- Manager Menu -->
+    {% elif user.employee.role == 'manager' %}
+    <ul class="sidebar-menu">
+        <div class="sidebar-section-title">Dashboard</div>
+        <li><a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+    </ul>
+    
+    <ul class="sidebar-menu">
+        <div class="sidebar-section-title">Team Management</div>
+        <li><a href="{% url 'employee_list' %}"><i class="fas fa-users"></i> Team Members</a></li>
+        <li><a href="#"><i class="fas fa-tasks"></i> Assignments</a></li>
+        <li><a href="#"><i class="fas fa-chart-line"></i> Performance</a></li>
+    </ul>
+    
+    <ul class="sidebar-menu">
+        <div class="sidebar-section-title">Reports & Analytics</div>
+        <li><a href="#"><i class="fas fa-chart-bar"></i> Team Reports</a></li>
+        <li><a href="#"><i class="fas fa-clock"></i> Time Tracking</a></li>
+    </ul>
+    
+    <!-- Employee Menu -->
+    {% elif user.employee.role == 'employee' %}
+    <ul class="sidebar-menu">
+        <div class="sidebar-section-title">Dashboard</div>
+        <li><a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+    </ul>
+    
+    <ul class="sidebar-menu">
+        <div class="sidebar-section-title">My Profile</div>
+        <li><a href="#"><i class="fas fa-user"></i> View Profile</a></li>
+        <li><a href="#"><i class="fas fa-edit"></i> Edit Profile</a></li>
+        <li><a href="#"><i class="fas fa-lock"></i> Change Password</a></li>
+    </ul>
+    
+    <ul class="sidebar-menu">
+        <div class="sidebar-section-title">My Requests</div>
+        <li><a href="#"><i class="fas fa-file-contract"></i> Leave Requests</a></li>
+        <li><a href="#"><i class="fas fa-edit"></i> Request Leave</a></li>
+        <li><a href="#"><i class="fas fa-calendar"></i> Attendance</a></li>
+    </ul>
+    
+    <ul class="sidebar-menu">
+        <div class="sidebar-section-title">My Documents</div>
+        <li><a href="#"><i class="fas fa-file-pdf"></i> Salary Slip</a></li>
+        <li><a href="#"><i class="fas fa-file"></i> Documents</a></li>
+    </ul>
+    {% endif %}
+</div>
+{% endif %}
