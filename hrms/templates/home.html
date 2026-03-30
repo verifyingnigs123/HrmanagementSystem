@@ -84,12 +84,10 @@
 <!-- Login Form -->
 <div class="login-form-container">
     <!-- Error Messages -->
-    {% if form.non_field_errors %}
-        <div style="background: #f8f9fa; border-left: 4px solid #666; padding: 12px; border-radius: 5px; margin-bottom: 1.5rem; color: #333;">
-            <strong>Login Failed</strong>
-            {% for error in form.non_field_errors %}
-                <p>{{ error }}</p>
-            {% endfor %}
+    {% if error_message %}
+        <div style="background: #fee; border-left: 4px solid #d32f2f; padding: 12px; border-radius: 5px; margin-bottom: 1.5rem; color: #d32f2f;">
+            <strong><i class="fas fa-exclamation-circle"></i> Login Failed</strong>
+            <p>{{ error_message }}</p>
         </div>
     {% endif %}
     

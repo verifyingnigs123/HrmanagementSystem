@@ -11,6 +11,8 @@ def home(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
     
+    error_message = None
+    
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -20,13 +22,10 @@ def home(request):
             login(request, user)
             return redirect('dashboard')
         else:
-            # Authentication failed - show error and re-render form
-            from django import forms
-            form = forms.Form()
-            form.add_error(None, 'Invalid username or password')
-            return render(request, 'home.html', {'form': form})
+            # Authentication failed - set error message
+            error_message = 'Invalid username or password'
     
-    return render(request, 'home.html')
+    return render(request, 'home.html', {'error_message': error_message})
 
 @never_cache
 @login_required(login_url='admin:login')
