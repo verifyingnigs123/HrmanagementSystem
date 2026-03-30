@@ -192,7 +192,7 @@
                             <li><a class="dropdown-item" href="#"><i class="fas fa-lock"></i> Change Password</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <form method="post" action="/admin/logout/" style="display: inline;">
+                                <form method="post" action="{% url 'logout' %}" style="display: inline;">
                                     {% csrf_token %}
                                     <button type="submit" class="dropdown-item" style="background: none; border: none; cursor: pointer; width: 100%; text-align: left;">
                                         <i class="fas fa-sign-out-alt"></i> Logout
