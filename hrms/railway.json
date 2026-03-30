@@ -1,0 +1,12 @@
+# Railway deployment configuration
+runtime.txt:
+- python-3.11.9
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Database migrations
+python manage.py migrate
+
+# Collect static files
+python manage.py collectstatic --noinput
