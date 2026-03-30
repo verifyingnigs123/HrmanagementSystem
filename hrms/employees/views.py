@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.cache import never_cache
 from .models import Employee
 
+@never_cache
 def home(request):
     """Home/Login page - handles user authentication and redirects to dashboard."""
     if request.user.is_authenticated:
@@ -26,6 +28,7 @@ def home(request):
     
     return render(request, 'home.html')
 
+@never_cache
 @login_required(login_url='admin:login')
 def dashboard(request):
     """Unified dashboard - shows different content based on user role."""
@@ -65,6 +68,7 @@ def dashboard(request):
     except Employee.DoesNotExist:
         return redirect('home')
 
+@never_cache
 @login_required(login_url='admin:login')
 def employee_list(request):
     """List all employees."""
@@ -72,6 +76,7 @@ def employee_list(request):
     context = {'employees': employees}
     return render(request, 'employees/employee_list.html', context)
 
+@never_cache
 @login_required(login_url='admin:login')
 def employee_detail(request, pk):
     """View employee details."""

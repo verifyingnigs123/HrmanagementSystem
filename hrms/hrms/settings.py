@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'employees.middleware.SecurityHeadersMiddleware',  # Custom security headers
 ]
 
 ROOT_URLCONF = 'hrms.urls'
@@ -148,3 +149,36 @@ CSRF_TRUSTED_ORIGINS = [
 
 # Redirect after logout
 LOGOUT_REDIRECT_URL = 'home'
+
+# ============================================
+# ENHANCED SECURITY SETTINGS
+# ============================================
+
+# Session Security
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
+SESSION_COOKIE_SECURE = True if not DEBUG else False  # Only send over HTTPS in production
+SESSION_COOKIE_SAMESITE = 'Strict'  # Prevent CSRF attacks
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Session expires when browser closes (for shared computers)
+SESSION_COOKIE_AGE = 3600  # 1 hour session timeout
+
+# CSRF Protection
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SECURE = True if not DEBUG else False
+CSRF_COOKIE_SAMESITE = 'Strict'
+
+# Password Requirements
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 8}},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+# Security headers (for development, will be enforced in production by middleware)
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Disable browser cache for dynamic content
+CACHE_CONTROL_MAX_AGE = 0
