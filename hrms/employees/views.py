@@ -83,4 +83,38 @@ def employee_detail(request, pk):
     context = {'employee': employee}
     return render(request, 'employees/employee_detail.html', context)
 
-
+@never_cache
+@login_required(login_url='admin:login')
+def admin_dashboard(request):
+    """Custom admin dashboard - only for admin users."""
+    try:
+        employee = Employee.objects.get(user=request.user)
+        # Only allow admin to see this dashboard
+        if employee.role != 'admin':
+            return redirect('dashboard')
+    except Employee.DoesNotExist:
+        return redirect('home')
+    
+    # Get statistics
+    total_employees = Employee.objects.count()
+    active_employees = Employee.objects.filter(is_active=True).count()
+    total_users = Employee.objects.values('user').distinct().count()
+    
+    # Get departments
+    departments = Employee.objects.values_list('department', flat=True).distinct().count()
+    
+    # Get role distribution
+    role_distribution = {}
+    for role_choice, label in [('admin', 'Admin'), ('hradmin', 'HR Admin'), ('manager', 'Manager'), ('employee', 'Employee')]:
+        role_distribution[label] = Employee.objects.filter(role=role_choice).count()
+    
+    context = {
+        'total_employees': total_employees,
+        'active_employees': active_employees,
+        'total_users': total_users,
+        'total_departments': departments,
+        'role_distribution': role_distribution,
+        'role': 'admin',
+    }
+    
+    return render(request, 'employees/admin_dashboard.html', context)
