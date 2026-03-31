@@ -134,35 +134,38 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid px-5">
-            <a class="navbar-brand d-flex align-items-center" href="/" style="gap: 10px;">
-                <!-- HR Logo SVG -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
-                    <!-- Outer circle -->
-                    <circle cx="20" cy="20" r="19" fill="url(#gradientLogo)" stroke="#1e40af" stroke-width="2"/>
-                    
-                    <!-- People representation - left person -->
-                    <circle cx="12" cy="10" r="3" fill="white"/>
-                    <path d="M 9 14 Q 9 13 12 13 Q 15 13 15 14 L 15 18 Q 15 18 12 19 Q 9 18 9 18 Z" fill="white"/>
-                    
-                    <!-- People representation - right person -->
-                    <circle cx="28" cy="10" r="3" fill="white"/>
-                    <path d="M 25 14 Q 25 13 28 13 Q 31 13 31 14 L 31 18 Q 31 18 28 19 Q 25 18 25 18 Z" fill="white"/>
-                    
-                    <!-- Center person (larger) -->
-                    <circle cx="20" cy="12" r="4" fill="white"/>
-                    <path d="M 16 18 Q 16 16 20 16 Q 24 16 24 18 L 24 24 L 16 24 Z" fill="white"/>
-                    
-                    <!-- Handshake or connection line -->
-                    <path d="M 15 20 Q 20 22 25 20" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                    
-                    <!-- Gradient definition -->
+            <a class="navbar-brand d-flex align-items-center" href="/" style="gap: 12px;">
+                <!-- Professional HR Badge Logo -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45" fill="none">
                     <defs>
-                        <linearGradient id="gradientLogo" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                        <linearGradient id="hrGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
                             <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
                         </linearGradient>
+                        <filter id="hrShadow">
+                            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+                        </filter>
                     </defs>
+                    
+                    <!-- Outer circle background -->
+                    <circle cx="22.5" cy="22.5" r="21" fill="url(#hrGradient)" filter="url(#hrShadow)"/>
+                    
+                    <!-- Inner white circle for contrast -->
+                    <circle cx="22.5" cy="22.5" r="19.5" fill="none" stroke="white" stroke-width="1.5" opacity="0.4"/>
+                    
+                    <!-- HR initials - stylized -->
+                    <!-- H letter -->
+                    <path d="M 12 14 L 12 28 M 12 21 L 18 21 M 18 14 L 18 28" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    
+                    <!-- R letter -->
+                    <path d="M 24 14 L 24 28 M 24 14 L 29 14 Q 31 14 31 16 Q 31 18 29 18 L 24 18 M 29 18 L 31 28" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    
+                    <!-- Decorative elements - double line accent at bottom -->
+                    <line x1="10" y1="31" x2="35" y2="31" stroke="white" stroke-width="1.5" opacity="0.6"/>
+                    <line x1="10" y1="33" x2="35" y2="33" stroke="white" stroke-width="1" opacity="0.4"/>
                 </svg>
+                <span class="fw-bold" style="font-size: 1rem; color: #1e40af;">HR Management</span>
+            </a>
                 <span class="fw-bold" style="font-size: 1.1rem; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">HR Management System</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
