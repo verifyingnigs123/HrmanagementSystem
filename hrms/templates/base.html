@@ -182,8 +182,7 @@
                             <!-- Role-Based Menu Items -->
                             {% if user.employee %}
                                 {% if user.employee.role == 'admin' %}
-                                    <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}"><i class="fas fa-tools"></i> Admin Dashboard</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'employee_list' %}"><i class="fas fa-users"></i> Manage Employees</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'employee_list' %}"><i class="fas fa-users"></i> Employee Management</a></li>
                                     <li><a class="dropdown-item" href="/admin/employees/role/"><i class="fas fa-key"></i> Manage Roles</a></li>
                                 {% elif user.employee.role == 'hradmin' %}
                                     <li><a class="dropdown-item" href="{% url 'employee_list' %}"><i class="fas fa-users"></i> All Employees</a></li>

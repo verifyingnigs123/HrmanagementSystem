@@ -45,14 +45,26 @@ def dashboard(request):
         
         # Add role-specific data
         if role == 'admin':
-            role_counts = {}
+            # Admin sees dashboard + statistics
+            total_users = Employee.objects.values('user').distinct().count()
+            departments = Employee.objects.values_list('department', flat=True).distinct().count()
+            
+            role_distribution = {}
             for role_choice, label in [('admin', 'Admin'), ('hradmin', 'HR Admin'), ('manager', 'Manager'), ('employee', 'Employee')]:
-                role_counts[label] = Employee.objects.filter(role=role_choice).count()
-            context['role_counts'] = role_counts
+                role_distribution[label] = Employee.objects.filter(role=role_choice).count()
+            
+            context.update({
+                'is_admin': True,
+                'total_users': total_users,
+                'total_departments': departments,
+                'role_distribution': role_distribution,
+                'all_employees': Employee.objects.select_related('user').all(),
+            })
             
         elif role == 'hradmin':
             context['new_employees'] = Employee.objects.all().order_by('-hire_date')[:5]
             context['departments'] = list(Employee.objects.values_list('department', flat=True).distinct())
+            context['all_employees'] = Employee.objects.select_related('user').all()
             
         elif role == 'manager':
             team_members = Employee.objects.filter(department=employee.department).exclude(user=request.user)
@@ -70,9 +82,45 @@ def dashboard(request):
 @never_cache
 @login_required(login_url='admin:login')
 def employee_list(request):
-    """List all employees."""
+    """List all employees with admin management features."""
+    try:
+        user_employee = Employee.objects.get(user=request.user)
+        user_role = user_employee.role
+    except Employee.DoesNotExist:
+        return redirect('home')
+    
     employees = Employee.objects.select_related('user').all()
-    context = {'employees': employees}
+    
+    # Filter by role if parameter is provided
+    role_filter = request.GET.get('role')
+    if role_filter and role_filter in ['admin', 'hradmin', 'manager', 'employee']:
+        employees = employees.filter(role=role_filter)
+    
+    # Filter by status
+    status_filter = request.GET.get('status')
+    if status_filter == 'active':
+        employees = employees.filter(is_active=True)
+    elif status_filter == 'inactive':
+        employees = employees.filter(is_active=False)
+    
+    # Filter by department
+    department_filter = request.GET.get('department')
+    if department_filter:
+        employees = employees.filter(department=department_filter)
+    
+    # Get all departments for filter dropdown
+    departments = Employee.objects.values_list('department', flat=True).distinct()
+    
+    context = {
+        'employees': employees,
+        'departments': departments,
+        'user_role': user_role,
+        'can_manage': user_role in ['admin', 'hradmin'],
+        'current_role_filter': role_filter,
+        'current_status_filter': status_filter,
+        'current_department_filter': department_filter,
+    }
+    
     return render(request, 'employees/employee_list.html', context)
 
 @never_cache
