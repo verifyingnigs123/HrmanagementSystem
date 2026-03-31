@@ -183,14 +183,10 @@
                             {% if user.employee %}
                                 {% if user.employee.role == 'admin' %}
                                     <li><a class="dropdown-item" href="{% url 'employee_list' %}"><i class="fas fa-users"></i> Employee Management</a></li>
-                                    <li><a class="dropdown-item" href="/admin/employees/role/"><i class="fas fa-key"></i> Manage Roles</a></li>
                                 {% elif user.employee.role == 'hradmin' %}
                                     <li><a class="dropdown-item" href="{% url 'employee_list' %}"><i class="fas fa-users"></i> All Employees</a></li>
-                                    <li><a class="dropdown-item" href="/admin/employees/employee/add/"><i class="fas fa-plus"></i> Add Employee</a></li>
-                                    <li><a class="dropdown-item" href="/admin/"><i class="fas fa-cog"></i> Settings</a></li>
                                 {% elif user.employee.role == 'manager' %}
                                     <li><a class="dropdown-item" href="{% url 'employee_list' %}"><i class="fas fa-team"></i> Team Members</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="fas fa-chart-bar"></i> Reports</a></li>
                                 {% endif %}
                             {% endif %}
                             

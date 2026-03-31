@@ -22,7 +22,6 @@ from employees import views
 urlpatterns = [
     path('', views.home, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
-    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('employees/', views.employee_list, name='employee_list'),
     path('employees/<int:pk>/', views.employee_detail, name='employee_detail'),
     path('logout/', LogoutView.as_view(), name='logout'),
