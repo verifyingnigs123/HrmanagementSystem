@@ -3,14 +3,15 @@
     .sidebar {
         background: white;
         border-right: 1px solid #e0e0e0;
-        height: calc(100vh - 80px);
+        height: calc(100vh - 70px);
         position: fixed;
         left: 0;
-        top: 80px;
+        top: 70px;
         width: 250px;
         padding: 30px 0;
         overflow-y: auto;
         z-index: 100;
+        transition: all 0.3s ease;
     }
     
     .sidebar-header {
@@ -23,10 +24,13 @@
         color: #1a1a1a;
         font-weight: 600;
         margin-bottom: 5px;
+        font-size: 0.95rem;
+        word-break: break-word;
     }
     
     .sidebar-header small {
         color: #999;
+        font-size: 0.8rem;
     }
     
     .sidebar-menu {
@@ -47,6 +51,10 @@
         text-decoration: none;
         transition: all 0.3s ease;
         border-left: 3px solid transparent;
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .sidebar-menu a:hover {
@@ -60,6 +68,7 @@
         width: 20px;
         margin-right: 15px;
         text-align: center;
+        flex-shrink: 0;
     }
     
     .sidebar-section {
@@ -84,6 +93,7 @@
     
     .main-content {
         margin-left: 250px;
+        transition: all 0.3s ease;
     }
     
     .container-main {
@@ -93,12 +103,93 @@
     /* Adjust footer when sidebar is present */
     footer {
         margin-left: 250px !important;
+        transition: all 0.3s ease;
     }
     
-    /* Mobile Responsive */
+    /* Tablet (768px to 1024px) */
+    @media (max-width: 1024px) {
+        .sidebar {
+            width: 220px;
+            padding: 20px 0;
+            top: 70px;
+            height: calc(100vh - 70px);
+        }
+        
+        .sidebar-header {
+            padding: 0 15px 15px;
+        }
+        
+        .sidebar-menu a {
+            padding: 10px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .sidebar-menu a:hover {
+            padding-left: 17px;
+        }
+        
+        .main-content {
+            margin-left: 220px;
+        }
+        
+        footer {
+            margin-left: 220px !important;
+        }
+    }
+    
+    /* Small Tablets (768px and below) */
     @media (max-width: 768px) {
         .sidebar {
             width: 200px;
+            padding: 15px 0;
+        }
+        
+        .sidebar-header {
+            padding: 0 12px 12px;
+            margin-bottom: 15px;
+        }
+        
+        .sidebar-header h6 {
+            font-size: 0.9rem;
+        }
+        
+        .sidebar-menu a {
+            padding: 10px 12px;
+            font-size: 0.85rem;
+        }
+        
+        .sidebar-section-title {
+            padding: 8px 12px;
+            font-size: 0.7rem;
+        }
+        
+        .main-content {
+            margin-left: 0;
+        }
+        
+        footer {
+            margin-left: 0 !important;
+        }
+    }
+    
+    /* Mobile (576px and below) */
+    @media (max-width: 576px) {
+        .sidebar {
+            position: absolute;
+            width: 0;
+            left: -250px;
+            padding: 0;
+            height: 0;
+            overflow: hidden;
+        }
+        
+        .sidebar.show {
+            left: 0;
+            width: 200px;
+            height: calc(100vh - 60px);
+            top: 60px;
+            padding: 15px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         .main-content {
@@ -111,7 +202,7 @@
     }
 </style>
 
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
     <!-- Sidebar Header -->
     <div class="sidebar-header">
         <h6>{{ user.first_name|default:user.username }}</h6>
