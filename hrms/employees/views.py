@@ -3,7 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.cache import never_cache
-from .models import Employee
+from django.db import models
+from .models import (
+    Employee, Attendance, LeaveRequest, LeaveType, 
+    SalarySlip, Document, AttendancePolicy, AuditLog
+)
 
 @never_cache
 def home(request):
@@ -181,9 +185,33 @@ def employee_leave_requests(request):
     except Employee.DoesNotExist:
         return redirect('home')
     
+    # Fetch leave requests for this employee
+    leave_requests = LeaveRequest.objects.filter(employee=employee).select_related('leave_type', 'approved_by')
+    
+    # Calculate leave summary
+    leave_types = LeaveType.objects.filter(is_active=True)
+    leave_summary = []
+    for leave_type in leave_types:
+        allocated = leave_type.max_days_per_year
+        used = LeaveRequest.objects.filter(
+            employee=employee,
+            leave_type=leave_type,
+            status__in=['approved', 'pending']
+        ).aggregate(total_days=models.Sum('number_of_days'))['total_days'] or 0
+        
+        leave_summary.append({
+            'type': leave_type.name,
+            'allocated': allocated,
+            'used': used,
+            'available': allocated - used,
+            'pending': LeaveRequest.objects.filter(employee=employee, leave_type=leave_type, status='pending').count()
+        })
+    
     context = {
         'employee': employee,
         'user': request.user,
+        'leave_requests': leave_requests,
+        'leave_summary': leave_summary,
     }
     return render(request, 'employees/leave_requests.html', context)
 
@@ -196,9 +224,13 @@ def employee_request_leave(request):
     except Employee.DoesNotExist:
         return redirect('home')
     
+    # Get available leave types
+    leave_types = LeaveType.objects.filter(is_active=True)
+    
     context = {
         'employee': employee,
         'user': request.user,
+        'leave_types': leave_types,
     }
     return render(request, 'employees/request_leave.html', context)
 
@@ -211,9 +243,32 @@ def employee_attendance(request):
     except Employee.DoesNotExist:
         return redirect('home')
     
+    # Fetch attendance records for this employee (last 30 days)
+    from datetime import timedelta
+    from django.utils import timezone
+    thirty_days_ago = timezone.now().date() - timedelta(days=30)
+    attendance_records = Attendance.objects.filter(
+        employee=employee,
+        date__gte=thirty_days_ago
+    ).order_by('-date')
+    
+    # Calculate attendance statistics
+    total_records = Attendance.objects.filter(employee=employee).count()
+    present = Attendance.objects.filter(employee=employee, status='present').count()
+    absent = Attendance.objects.filter(employee=employee, status='absent').count()
+    late = Attendance.objects.filter(employee=employee, status='late').count()
+    
     context = {
         'employee': employee,
         'user': request.user,
+        'attendance_records': attendance_records,
+        'stats': {
+            'total': total_records,
+            'present': present,
+            'absent': absent,
+            'late': late,
+            'percentage': round((present / total_records * 100), 2) if total_records > 0 else 0,
+        }
     }
     return render(request, 'employees/attendance.html', context)
 
@@ -226,9 +281,21 @@ def employee_salary_slips(request):
     except Employee.DoesNotExist:
         return redirect('home')
     
+    # Fetch salary slips for this employee
+    salary_slips = SalarySlip.objects.filter(employee=employee).order_by('-month')
+    
+    # Calculate salary summary
+    ytd_salary = salary_slips.aggregate(total=models.Sum('net_salary'))['total'] or 0
+    ytd_tax = salary_slips.aggregate(total=models.Sum('deductions'))['total'] or 0
+    current_month_slip = salary_slips.first()
+    
     context = {
         'employee': employee,
         'user': request.user,
+        'salary_slips': salary_slips,
+        'ytd_salary': ytd_salary,
+        'ytd_tax': ytd_tax,
+        'current_month_slip': current_month_slip,
     }
     return render(request, 'employees/salary_slips.html', context)
 
@@ -241,9 +308,19 @@ def employee_documents(request):
     except Employee.DoesNotExist:
         return redirect('home')
     
+    # Fetch documents for this employee
+    documents = Document.objects.filter(employee=employee).order_by('-created_at')
+    
+    # Group documents by category
+    doc_categories = {}
+    for category_value, category_name in Document.DOCUMENT_CATEGORY_CHOICES:
+        doc_categories[category_name] = documents.filter(category=category_value)
+    
     context = {
         'employee': employee,
         'user': request.user,
+        'documents': documents,
+        'doc_categories': doc_categories,
     }
     return render(request, 'employees/documents.html', context)
 
