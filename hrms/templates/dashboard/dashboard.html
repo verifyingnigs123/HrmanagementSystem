@@ -747,24 +747,24 @@
                 </div>
                 <div class="card-body">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
-                        <button type="button" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem;">
+                        <a href="{% url 'employee_profile' %}" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center;">
                             <i class="fas fa-user-circle"></i> View Profile
-                        </button>
-                        <button type="button" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem;">
+                        </a>
+                        <a href="{% url 'employee_request_leave' %}" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center;">
                             <i class="fas fa-calendar-alt"></i> Request Leave
-                        </button>
-                        <button type="button" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem;">
+                        </a>
+                        <a href="{% url 'employee_attendance' %}" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center;">
                             <i class="fas fa-clock"></i> Check Attendance
-                        </button>
-                        <button type="button" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem;">
+                        </a>
+                        <a href="{% url 'employee_documents' %}" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center;">
                             <i class="fas fa-file-alt"></i> View Documents
-                        </button>
-                        <button type="button" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem;">
-                            <i class="fas fa-lock"></i> Change Password
-                        </button>
-                        <button type="button" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem;">
-                            <i class="fas fa-bell"></i> View Notifications
-                        </button>
+                        </a>
+                        <a href="/mobile/check-in/" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-mobile-alt"></i> Mobile Check-in
+                        </a>
+                        <a href="{% url 'employee_salary_slips' %}" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-file-invoice-dollar"></i> Salary Slips
+                        </a>
                     </div>
                 </div>
             </div>
