@@ -1,0 +1,621 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="HRMS Check-in">
+    <meta name="theme-color" content="#1877f2">
+    <title>HRMS Mobile Check-in</title>
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Ccircle cx='90' cy='90' r='90' fill='%231877f2'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='80' font-weight='bold' font-family='Arial'%3EHI%3C/text%3E%3C/svg%3E">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{% url 'api:manifest' %}">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #1877f2;
+            --primary-dark: #0a63d6;
+            --success: #52c41a;
+            --warning: #faad14;
+            --danger: #f5222d;
+            --light-bg: #f5f7fa;
+            --white: #ffffff;
+            --text-dark: #050505;
+            --text-muted: #999;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            min-height: 100vh;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 10px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            margin-top: 10px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: var(--white);
+            font-size: 40px;
+            font-weight: bold;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .current-time {
+            text-align: center;
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .time-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .date-display {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+        
+        .status-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .status-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .status-card.present {
+            border-left-color: var(--success);
+        }
+        
+        .status-card.present .status-value {
+            color: var(--success);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+        }
+        
+        .btn-primary:active {
+            background: var(--primary-dark);
+            transform: translateY(2px);
+            box-shadow: 0 2px 6px rgba(24, 119, 242, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            background: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background: #f0f2f5;
+            color: var(--text-dark);
+            border: 1px solid #ddd;
+        }
+        
+        .btn-secondary:active {
+            background: #e8eef7;
+        }
+        
+        .location-info {
+            background: #e8f5e9;
+            border-left: 4px solid var(--success);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            font-size: 0.85rem;
+            color: #2e7d32;
+        }
+        
+        .location-error {
+            background: #ffebee;
+            border-left: 4px solid var(--danger);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            font-size: 0.85rem;
+            color: #c62828;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        
+        .alert-success {
+            background: #f6ffed;
+            color: #22863a;
+            border-left: 4px solid var(--success);
+        }
+        
+        .alert-error {
+            background: #fff5f5;
+            color: #a61e4d;
+            border-left: 4px solid var(--danger);
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            color: #01579b;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .attendance-log {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .log-header {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+        
+        .log-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .log-label {
+            color: var(--text-muted);
+        }
+        
+        .log-value {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .spinner {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-height: 667px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header {
+                margin-bottom: 15px;
+            }
+            
+            .logo {
+                width: 60px;
+                height: 60px;
+                font-size: 32px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">HI</div>
+            <h1>Check-in</h1>
+            <p id="employee-name">Loading...</p>
+        </div>
+        
+        <!-- Alerts -->
+        <div id="alerts"></div>
+        
+        <!-- Current Time -->
+        <div class="current-time">
+            <div class="time-display" id="current-time">--:--:--</div>
+            <div class="date-display" id="current-date">Loading date...</div>
+        </div>
+        
+        <!-- Status Card -->
+        <div class="status-card" id="status-card">
+            <div class="status-label">Today's Status</div>
+            <div class="status-value" id="status-value">NOT CHECKED IN</div>
+            <div id="status-details"></div>
+        </div>
+        
+        <!-- Check-in / Check-out Buttons -->
+        <div id="button-container">
+            <button class="btn btn-primary" id="check-in-btn" onclick="handleCheckIn()">
+                <span id="check-in-text">CHECK IN</span>
+            </button>
+            <button class="btn btn-secondary" id="check-out-btn" onclick="handleCheckOut()" disabled>
+                CHECK OUT
+            </button>
+        </div>
+        
+        <!-- Location Info -->
+        <div id="location-info"></div>
+        
+        <!-- Attendance Log -->
+        <div id="attendance-log" class="attendance-log hidden">
+            <div class="log-header">Today's Activity</div>
+            <div id="log-content"></div>
+        </div>
+    </div>
+    
+    <script>
+        // API Configuration
+        const API_BASE = window.location.origin + '/api';
+        let currentUser = null;
+        let todayAttendance = null;
+        let latitude = null;
+        let longitude = null;
+        
+        // Initialize app
+        async function initApp() {
+            console.log('Initializing HRMS Mobile Check-in App');
+            
+            // Update current time
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            
+            // Get user profile
+            await getUserProfile();
+            
+            // Get today's attendance
+            await getTodayAttendance();
+            
+            // Get GPS location
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(
+                    (position) => {
+                        latitude = position.coords.latitude;
+                        longitude = position.coords.longitude;
+                        showLocationInfo(`📍 ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+                    },
+                    (error) => {
+                        console.warn('GPS error:', error);
+                        showLocationError('GPS not available');
+                    },
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+            }
+        }
+        
+        function updateCurrentTime() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const date = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            document.getElementById('current-time').textContent = time;
+            document.getElementById('current-date').textContent = date;
+        }
+        
+        async function getUserProfile() {
+            try {
+                const response = await fetch(`${API_BASE}/employee/profile/`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data.data;
+                    document.getElementById('employee-name').textContent = `${currentUser.user.first_name} ${currentUser.user.last_name}`;
+                } else if (response.status === 401) {
+                    showAlert('Please log in first', 'error');
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Profile fetch error:', error);
+                showAlert('Could not load profile', 'error');
+            }
+        }
+        
+        async function getTodayAttendance() {
+            try {
+                const response = await fetch(`${API_BASE}/attendance/today/`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    todayAttendance = data.data;
+                    updateStatusCard();
+                }
+            } catch (error) {
+                console.error('Attendance fetch error:', error);
+            }
+        }
+        
+        function updateStatusCard() {
+            const statusCard = document.getElementById('status-card');
+            const statusValue = document.getElementById('status-value');
+            const statusDetails = document.getElementById('status-details');
+            const checkInBtn = document.getElementById('check-in-btn');
+            const checkOutBtn = document.getElementById('check-out-btn');
+            
+            if (todayAttendance) {
+                statusCard.classList.add('present');
+                statusValue.textContent = todayAttendance.status.toUpperCase();
+                
+                let details = '';
+                if (todayAttendance.check_in_time) {
+                    details += `<div class="log-entry"><span class="log-label">Check-in:</span><span class="log-value">${todayAttendance.check_in_time}</span></div>`;
+                    checkInBtn.disabled = true;
+                }
+                if (todayAttendance.check_out_time) {
+                    details += `<div class="log-entry"><span class="log-label">Check-out:</span><span class="log-value">${todayAttendance.check_out_time}</span></div>`;
+                    checkOutBtn.disabled = true;
+                } else if (todayAttendance.check_in_time) {
+                    checkOutBtn.disabled = false;
+                }
+                
+                statusDetails.innerHTML = details;
+            } else {
+                checkInBtn.disabled = false;
+                checkOutBtn.disabled = true;
+            }
+        }
+        
+        async function handleCheckIn() {
+            if (!latitude || !longitude) {
+                showAlert('Waiting for GPS location...', 'info');
+                return;
+            }
+            
+            const btn = document.getElementById('check-in-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Checking in...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/attendance/check-in/`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        latitude: latitude,
+                        longitude: longitude,
+                        notes: ''
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    todayAttendance = data.data;
+                    updateStatusCard();
+                    showAlert('✓ Checked in successfully!', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.message || 'Check-in failed', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = 'CHECK IN';
+                }
+            } catch (error) {
+                console.error('Check-in error:', error);
+                showAlert('Network error. Please try again.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = 'CHECK IN';
+            }
+        }
+        
+        async function handleCheckOut() {
+            if (!latitude || !longitude) {
+                showAlert('Waiting for GPS location...', 'info');
+                return;
+            }
+            
+            const btn = document.getElementById('check-out-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Checking out...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/attendance/check-out/`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        latitude: latitude,
+                        longitude: longitude,
+                        notes: ''
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    todayAttendance = data.data;
+                    updateStatusCard();
+                    showAlert('✓ Checked out successfully!', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.message || 'Check-out failed', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = 'CHECK OUT';
+                }
+            } catch (error) {
+                console.error('Check-out error:', error);
+                showAlert('Network error. Please try again.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = 'CHECK OUT';
+            }
+        }
+        
+        function showAlert(message, type = 'info') {
+            const alertsContainer = document.getElementById('alerts');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertsContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 4000);
+        }
+        
+        function showLocationInfo(message) {
+            const container = document.getElementById('location-info');
+            container.innerHTML = `<div class="location-info">${message}</div>`;
+        }
+        
+        function showLocationError(message) {
+            const container = document.getElementById('location-info');
+            container.innerHTML = `<div class="location-error">⚠️ ${message}</div>`;
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Start app when DOM is ready
+        document.addEventListener('DOMContentLoaded', initApp);
+        
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('{% url "api:service_worker" %}')
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed:', err));
+        }
+    </script>
+</body>
+</html>

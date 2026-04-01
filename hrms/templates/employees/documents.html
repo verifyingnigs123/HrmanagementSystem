@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Documents - HRMS{% endblock %}
+
+{% block content %}
+<div class="container-main p-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+                    <div>
+                        <i class="fas fa-file me-2" style="font-size: 1.5rem;"></i>
+                        <h4 class="mb-0" style="display: inline;">My Documents</h4>
+                    </div>
+                    <button class="btn btn-light btn-sm">
+                        <i class="fas fa-upload"></i> Upload Document
+                    </button>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Document Name</th>
+                                    <th>Type</th>
+                                    <th>Upload Date</th>
+                                    <th>Expiry Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        <i class="fas fa-inbox"></i> No documents uploaded yet
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Categories -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-id-card"></i> Identification Documents
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Passport</span>
+                                    <span class="badge bg-secondary">Not Uploaded</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>National ID</span>
+                                    <span class="badge bg-secondary">Not Uploaded</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Driver License</span>
+                                    <span class="badge bg-secondary">Not Uploaded</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-graduation-cap"></i> Qualification Documents
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Degree Certificate</span>
+                                    <span class="badge bg-secondary">Not Uploaded</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Diploma Certificate</span>
+                                    <span class="badge bg-secondary">Not Uploaded</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Professional Certifications</span>
+                                    <span class="badge bg-secondary">Not Uploaded</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-file-contract"></i> Certifications
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Work Permit</span>
+                                    <span class="badge bg-secondary">Not Uploaded</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Background Check</span>
+                                    <span class="badge bg-secondary">Not Uploaded</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Medical Certificate</span>
+                                    <span class="badge bg-secondary">Not Uploaded</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-bank"></i> Financial Documents
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Bank Account Details</span>
+                                    <span class="badge bg-secondary">Not Uploaded</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Tax Information</span>
+                                    <span class="badge bg-secondary">Not Uploaded</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Insurance Details</span>
+                                    <span class="badge bg-secondary">Not Uploaded</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+    }
+
+    .card-header {
+        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .btn-light {
+        background-color: #ffffff;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+
+    .btn-light:hover {
+        background-color: #f8f9fa;
+    }
+
+    .list-group-item {
+        padding: 0.75rem 0;
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}

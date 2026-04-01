@@ -683,23 +683,166 @@
 
     <!-- EMPLOYEE DASHBOARD -->
     {% else %}
-    <!-- Employee Profile Section -->
+    
+    <!-- Welcome Section with Employee Info -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card" style="border-left: 5px solid var(--primary-color);">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <h2 style="margin: 0 0 5px 0; color: #1e293b; font-weight: 700;">
+                                Welcome back, {{ employee.user.first_name }}! 👋
+                            </h2>
+                            <p style="margin: 0; color: #64748b; font-size: 0.95rem;">
+                                {{ employee.position }} • {{ employee.department }}
+                            </p>
+                        </div>
+                        <div style="text-align: right; margin-top: 10px;">
+                            <div style="font-size: 2.5rem;">
+                                {{ employee.user.first_name|first|upper }}{{ employee.user.last_name|first|upper }}
+                            </div>
+                            <small style="color: #64748b;">ID: {{ employee.employee_id }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4 col-sm-6">
+            <div class="metric-card" style="border-left: 4px solid #52c41a;">
+                <div class="metric-icon" style="color: #52c41a;">📅</div>
+                <div class="metric-label">Today's Status</div>
+                <div class="metric-value" style="color: #52c41a; font-size: 1.5rem;">Present</div>
+                <p style="margin: 8px 0 0 0; font-size: 0.85rem; color: #64748b;">Last check-in: 9:00 AM</p>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <div class="metric-card" style="border-left: 4px solid #1890ff;">
+                <div class="metric-icon" style="color: #1890ff;">🎯</div>
+                <div class="metric-label">Remaining Leaves</div>
+                <div class="metric-value" style="color: #1890ff; font-size: 1.5rem;">12</div>
+                <p style="margin: 8px 0 0 0; font-size: 0.85rem; color: #64748b;">Allocated: 20 leaves/year</p>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <div class="metric-card" style="border-left: 4px solid #faad14;">
+                <div class="metric-icon" style="color: #faad14;">💼</div>
+                <div class="metric-label">Status</div>
+                <div class="metric-value" style="color: #faad14; font-size: 1.2rem;">Active</div>
+                <p style="margin: 8px 0 0 0; font-size: 0.85rem; color: #64748b;">Employment active since {{ employee.hire_date|date:"M d, Y" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
     <div class="row mb-4">
         <div class="col-md-12">
             <div class="card">
+                <div class="card-header">
+                    ⚡ Quick Actions
+                </div>
                 <div class="card-body">
-                    <div class="profile-card-header">
-                        <div class="profile-avatar">
-                            {{ employee.user.first_name|first|upper }}{{ employee.user.last_name|first|upper }}
-                        </div>
-                        <div class="profile-info">
-                            <h3>{{ employee.user.first_name }} {{ employee.user.last_name }}</h3>
-                            <p>{{ employee.position }} • {{ employee.department }}</p>
-                            <p class="text-muted">{{ employee.employee_id }}</p>
-                        </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                        <button type="button" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem;">
+                            <i class="fas fa-user-circle"></i> View Profile
+                        </button>
+                        <button type="button" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem;">
+                            <i class="fas fa-calendar-alt"></i> Request Leave
+                        </button>
+                        <button type="button" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem;">
+                            <i class="fas fa-clock"></i> Check Attendance
+                        </button>
+                        <button type="button" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem;">
+                            <i class="fas fa-file-alt"></i> View Documents
+                        </button>
+                        <button type="button" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem;">
+                            <i class="fas fa-lock"></i> Change Password
+                        </button>
+                        <button type="button" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem;">
+                            <i class="fas fa-bell"></i> View Notifications
+                        </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <!-- Profile Information -->
+    <!-- Profile Summary & Recent Updates -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    👤 Profile Summary
+                </div>
+                <div class="card-body">
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">{{ employee.user.email }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Phone</span>
+                        <span class="info-value">{{ employee.phone|default:"Not provided" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Department</span>
+                        <span class="info-value">{{ employee.department }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Position</span>
+                        <span class="info-value">{{ employee.position }}</span>
+                    </div>
+                    <div class="info-item" style="border-bottom: none;">
+                        <span class="info-label">Employment Status</span>
+                        <span class="info-value">
+                            {% if employee.is_active %}
+                            <span class="badge badge-success">Active</span>
+                            {% else %}
+                            <span class="badge badge-danger">Inactive</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    📢 Important Notices
+                </div>
+                <div class="card-body">
+                    {% if employee.is_active %}
+                    <div class="alert alert-success" style="margin-bottom: 10px;">
+                        <i class="fas fa-check-circle"></i> <strong>Active Status</strong><br>
+                        <small>Your account is active and in good standing</small>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning" style="margin-bottom: 10px;">
+                        <i class="fas fa-exclamation-circle"></i> <strong>Inactive Account</strong><br>
+                        <small>Please contact HR for more information</small>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="alert alert-info" style="margin-bottom: 0;">
+                        <i class="fas fa-info-circle"></i> <strong>Last Update</strong><br>
+                        <small>Your profile was last updated on {{ employee.hire_date|date:"M d, Y" }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal Information Section -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    📋 Personal Information
+                </div>
+                <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="info-item">
@@ -710,37 +853,23 @@
                                 <span class="info-label">Employee ID</span>
                                 <span class="info-value">{{ employee.employee_id }}</span>
                             </div>
-                            <div class="info-item">
-                                <span class="info-label">Department</span>
-                                <span class="info-value">{{ employee.department }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Position</span>
-                                <span class="info-value">{{ employee.position }}</span>
+                            <div class="info-item" style="border-bottom: none;">
+                                <span class="info-label">Date of Birth</span>
+                                <span class="info-value">{{ employee.date_of_birth|date:"M d, Y"|default:"Not provided" }}</span>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="info-item">
-                                <span class="info-label">Email</span>
-                                <span class="info-value">{{ employee.user.email }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Phone</span>
-                                <span class="info-value">{{ employee.phone|default:"Not provided" }}</span>
-                            </div>
                             <div class="info-item">
                                 <span class="info-label">Hire Date</span>
                                 <span class="info-value">{{ employee.hire_date|date:"M d, Y"|default:"Not provided" }}</span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Status</span>
-                                <span class="info-value">
-                                    {% if employee.is_active %}
-                                    <span class="badge badge-success">Active</span>
-                                    {% else %}
-                                    <span class="badge badge-danger">Inactive</span>
-                                    {% endif %}
-                                </span>
+                                <span class="info-label">Salary</span>
+                                <span class="info-value">{{ employee.salary|default:"Not provided" }}</span>
+                            </div>
+                            <div class="info-item" style="border-bottom: none;">
+                                <span class="info-label">Account Created</span>
+                                <span class="info-value">{{ employee.user.date_joined|date:"M d, Y" }}</span>
                             </div>
                         </div>
                     </div>
@@ -748,58 +877,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Additional Information -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    📋 Additional Information
-                </div>
-                <div class="card-body">
-                    <div class="info-item">
-                        <span class="info-label">Date of Birth</span>
-                        <span class="info-value">{{ employee.date_of_birth|date:"M d, Y"|default:"Not provided" }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Salary</span>
-                        <span class="info-value">{{ employee.salary|default:"Not provided" }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    ℹ️ Status Summary
-                </div>
-                <div class="card-body">
-                    {% if employee.is_active %}
-                    <div class="alert alert-success">
-                        ✅ You are currently an active employee
-                    </div>
-                    {% else %}
-                    <div class="alert alert-warning">
-                        ⚠️ Your account is currently inactive
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Employee Actions -->
-    <div class="row">
-        <div class="col-md-12">
-            <button class="btn btn-primary" disabled>
-                ✏️ Edit Profile (Coming Soon)
-            </button>
-            <button class="btn btn-secondary" disabled>
-                🔐 Change Password (Coming Soon)
-            </button>
-        </div>
-    </div>
-
     {% endif %}
 </div>
 {% endblock %}

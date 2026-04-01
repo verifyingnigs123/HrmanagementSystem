@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Salary Slips - HRMS{% endblock %}
+
+{% block content %}
+<div class="container-main p-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+                    <div>
+                        <i class="fas fa-file-pdf me-2" style="font-size: 1.5rem;"></i>
+                        <h4 class="mb-0" style="display: inline;">My Salary Slips</h4>
+                    </div>
+                    <div>
+                        <select class="form-select" style="width: 150px; display: inline-block;">
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Year</th>
+                                    <th>Basic Salary</th>
+                                    <th>Allowances</th>
+                                    <th>Deductions</th>
+                                    <th>Net Salary</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">
+                                        <i class="fas fa-inbox"></i> No salary slips available
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Salary Summary Card -->
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="text-muted">Current Month</h5>
+                            <h3 class="text-primary">$5,000</h3>
+                            <small class="text-muted">Net Salary</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="text-muted">YTD Salary</h5>
+                            <h3 class="text-success">$45,000</h3>
+                            <small class="text-muted">Year to Date</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="text-muted">YTD Tax</h5>
+                            <h3 class="text-danger">$5,400</h3>
+                            <small class="text-muted">Year to Date</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="text-muted">Last Paid</h5>
+                            <h3 class="text-info">April 1, 2024</h3>
+                            <small class="text-muted">Payment Date</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+    }
+
+    .card-header {
+        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .form-select {
+        border-radius: 0.375rem;
+    }
+</style>
+{% endblock %}

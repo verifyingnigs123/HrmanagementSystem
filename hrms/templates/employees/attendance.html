@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Attendance - HRMS{% endblock %}
+
+{% block content %}
+<div class="container-main p-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+                    <div>
+                        <i class="fas fa-calendar me-2" style="font-size: 1.5rem;"></i>
+                        <h4 class="mb-0" style="display: inline;">My Attendance</h4>
+                    </div>
+                    <div>
+                        <input type="month" class="form-control" style="width: 150px; display: inline-block;" placeholder="Select Month">
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Attendance Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="text-muted">Total Days</h5>
+                                    <h3 class="text-primary">22</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="text-muted">Present</h5>
+                                    <h3 class="text-success">22</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="text-muted">Absent</h5>
+                                    <h3 class="text-danger">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="text-muted">Attendance %</h5>
+                                    <h3 class="text-info">100%</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendance Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Duration</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        <i class="fas fa-inbox"></i> No attendance records found
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+    }
+
+    .card-header {
+        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}

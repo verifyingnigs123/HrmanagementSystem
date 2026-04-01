@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Leave Requests - HRMS{% endblock %}
+
+{% block content %}
+<div class="container-main p-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+                    <div>
+                        <i class="fas fa-file-contract me-2" style="font-size: 1.5rem;"></i>
+                        <h4 class="mb-0" style="display: inline;">My Leave Requests</h4>
+                    </div>
+                    <a href="{% url 'employee_request_leave' %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-plus"></i> New Leave Request
+                    </a>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>Leave Type</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Duration</th>
+                                    <th>Status</th>
+                                    <th>Reason</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted py-4">
+                                        <i class="fas fa-inbox"></i> No leave requests yet. <a href="{% url 'employee_request_leave' %}">Submit your first request</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leave Summary Card -->
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="text-muted">Total Leaves Allocated</h5>
+                            <h3 class="text-primary">20</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="text-muted">Used</h5>
+                            <h3 class="text-danger">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="text-muted">Pending Approval</h5>
+                            <h3 class="text-warning">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="text-muted">Available</h5>
+                            <h3 class="text-success">20</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+    }
+
+    .card-header {
+        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .btn-light {
+        background-color: #ffffff;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+
+    .btn-light:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}

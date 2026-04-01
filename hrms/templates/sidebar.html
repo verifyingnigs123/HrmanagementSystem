@@ -54,7 +54,7 @@
         display: flex;
         align-items: center;
         padding: 10px 20px;
-        color: var(--text-color);
+        color: var(--sidebar-text);
         text-decoration: none;
         transition: all 0.2s ease;
         border-left: 3px solid transparent;
@@ -62,10 +62,18 @@
     }
     
     .sidebar-menu a:hover {
-        background-color: #f5f6f7;
-        color: var(--primary-color);
+        background-color: #2b3e50;
+        color: white;
         border-left-color: var(--primary-color);
         padding-left: 20px;
+        font-weight: 500;
+    }
+    
+    .sidebar-menu a.active {
+        background-color: #2b3e50;
+        color: white;
+        border-left-color: var(--primary-color);
+        font-weight: 500;
     }
     
     .sidebar-menu a i {
@@ -77,7 +85,7 @@
     .sidebar-section {
         margin: 0;
         padding: 15px 0;
-        border-top: 1px solid #eee;
+        border-top: 1px solid var(--sidebar-header-border);
     }
     
     .sidebar-section:first-of-type {
@@ -92,6 +100,7 @@
         color: var(--text-secondary);
         font-weight: 700;
         letter-spacing: 0.5px;
+        transition: color 0.3s ease;
     }
     
     .main-content {
@@ -198,8 +207,6 @@
         <div class="sidebar-section-title">Employee Management</div>
         <li><a href="{% url 'employee_list' %}"><i class="fas fa-users"></i> All Employees</a></li>
     </ul>
-        <li><a href="/admin/employees/employee/"><i class="fas fa-edit"></i> Manage Employees</a></li>
-    </ul>
     
     <ul class="sidebar-menu">
         <div class="sidebar-section-title">HR Operations</div>
@@ -243,23 +250,45 @@
     
     <ul class="sidebar-menu">
         <div class="sidebar-section-title">My Profile</div>
-        <li><a href="#"><i class="fas fa-user"></i> View Profile</a></li>
-        <li><a href="#"><i class="fas fa-edit"></i> Edit Profile</a></li>
-        <li><a href="#"><i class="fas fa-lock"></i> Change Password</a></li>
+        <li><a href="{% url 'employee_profile' %}"><i class="fas fa-user"></i> View Profile</a></li>
     </ul>
     
     <ul class="sidebar-menu">
         <div class="sidebar-section-title">My Requests</div>
-        <li><a href="#"><i class="fas fa-file-contract"></i> Leave Requests</a></li>
-        <li><a href="#"><i class="fas fa-edit"></i> Request Leave</a></li>
-        <li><a href="#"><i class="fas fa-calendar"></i> Attendance</a></li>
+        <li><a href="{% url 'employee_leave_requests' %}"><i class="fas fa-file-contract"></i> Leave Requests</a></li>
+        <li><a href="{% url 'employee_request_leave' %}"><i class="fas fa-edit"></i> Request Leave</a></li>
+        <li><a href="{% url 'employee_attendance' %}"><i class="fas fa-calendar"></i> Attendance</a></li>
     </ul>
     
     <ul class="sidebar-menu">
         <div class="sidebar-section-title">My Documents</div>
-        <li><a href="#"><i class="fas fa-file-pdf"></i> Salary Slip</a></li>
-        <li><a href="#"><i class="fas fa-file"></i> Documents</a></li>
+        <li><a href="{% url 'employee_salary_slips' %}"><i class="fas fa-file-pdf"></i> Salary Slip</a></li>
+        <li><a href="{% url 'employee_documents' %}"><i class="fas fa-file"></i> Documents</a></li>
     </ul>
     {% endif %}
 </div>
+
+<!-- Active Link Highlighting Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all sidebar links
+        const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
+        const currentPath = window.location.pathname;
+        
+        sidebarLinks.forEach(function(link) {
+            // Get the href attribute
+            const href = link.getAttribute('href');
+            
+            // Check if the href matches the current path
+            if (href && href !== '#' && currentPath.includes(href.replace(/^.*\/#/, ''))) {
+                link.classList.add('active');
+            }
+            
+            // Also check for exact match
+            if (href === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>
 {% endif %}
