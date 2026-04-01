@@ -193,13 +193,32 @@
         }
         
         .location-error {
-            background: #ffebee;
-            border-left: 4px solid var(--danger);
+            background: #fff8e1;
+            border-left: 4px solid var(--warning);
             padding: 12px;
             border-radius: 8px;
             margin: 12px 0;
             font-size: 0.85rem;
-            color: #c62828;
+            color: #f57f17;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .retry-gps-btn {
+            background: var(--warning);
+            color: var(--white);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            white-space: nowrap;
+            margin-left: 8px;
+        }
+        
+        .retry-gps-btn:hover {
+            background: #f59b00;
         }
         
         .alert {
@@ -384,21 +403,61 @@
             // Get today's attendance
             await getTodayAttendance();
             
-            // Get GPS location
-            if (navigator.geolocation) {
-                navigator.geolocation.watchPosition(
-                    (position) => {
-                        latitude = position.coords.latitude;
-                        longitude = position.coords.longitude;
-                        showLocationInfo(`📍 ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
-                    },
-                    (error) => {
-                        console.warn('GPS error:', error);
-                        showLocationError('GPS not available');
-                    },
-                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                );
+            // Request GPS location
+            requestGPSLocation();
+        }
+        
+        function requestGPSLocation() {
+            if (!navigator.geolocation) {
+                showLocationError('⚠️ Geolocation not supported on this device');
+                return;
             }
+            
+            // Try high accuracy first
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    latitude = position.coords.latitude;
+                    longitude = position.coords.longitude;
+                    showLocationInfo(`📍 ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+                },
+                (error) => {
+                    console.warn('GPS high accuracy error:', error.code, error.message);
+                    // Fallback: try with lower accuracy
+                    retryGPSWithLowerAccuracy();
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+        
+        function retryGPSWithLowerAccuracy() {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    latitude = position.coords.latitude;
+                    longitude = position.coords.longitude;
+                    showLocationInfo(`📍 ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+                },
+                (error) => {
+                    console.warn('GPS low accuracy error:', error.code, error.message);
+                    handleGPSError(error);
+                },
+                { enableHighAccuracy: false, timeout: 15000, maximumAge: 0 }
+            );
+        }
+        
+        function handleGPSError(error) {
+            let errorMessage = '⚠️ GPS not available';
+            
+            if (error.code === error.PERMISSION_DENIED) {
+                errorMessage = '⚠️ Location permission denied. Enable in phone settings.';
+            } else if (error.code === error.POSITION_UNAVAILABLE) {
+                errorMessage = '⚠️ Your location could not be determined. Try moving to a clear area.';
+            } else if (error.code === error.TIMEOUT) {
+                errorMessage = '⚠️ Location request timed out. Try again or proceed without GPS.';
+            }
+            
+            showLocationError(errorMessage);
+            showAlert('💡 Tip: Location is optional for check-in', 'info');
+        }
         }
         
         function updateCurrentTime() {
@@ -482,8 +541,7 @@
         
         async function handleCheckIn() {
             if (!latitude || !longitude) {
-                showAlert('Waiting for GPS location...', 'info');
-                return;
+                showAlert('⚠️ GPS location not available. Checking in without location...', 'info');
             }
             
             const btn = document.getElementById('check-in-btn');
@@ -500,9 +558,9 @@
                         'X-CSRFToken': getCookie('csrftoken')
                     },
                     body: JSON.stringify({
-                        latitude: latitude,
-                        longitude: longitude,
-                        notes: ''
+                        latitude: latitude || null,
+                        longitude: longitude || null,
+                        notes: latitude && longitude ? '' : 'Check-in without GPS'
                     })
                 });
                 
@@ -527,8 +585,7 @@
         
         async function handleCheckOut() {
             if (!latitude || !longitude) {
-                showAlert('Waiting for GPS location...', 'info');
-                return;
+                showAlert('⚠️ GPS location not available. Checking out without location...', 'info');
             }
             
             const btn = document.getElementById('check-out-btn');
@@ -545,9 +602,9 @@
                         'X-CSRFToken': getCookie('csrftoken')
                     },
                     body: JSON.stringify({
-                        latitude: latitude,
-                        longitude: longitude,
-                        notes: ''
+                        latitude: latitude || null,
+                        longitude: longitude || null,
+                        notes: latitude && longitude ? '' : 'Check-out without GPS'
                     })
                 });
                 
@@ -589,7 +646,12 @@
         
         function showLocationError(message) {
             const container = document.getElementById('location-info');
-            container.innerHTML = `<div class="location-error">⚠️ ${message}</div>`;
+            container.innerHTML = `
+                <div class="location-error">
+                    <span>${message}</span>
+                    <button class="retry-gps-btn" onclick="requestGPSLocation()">Retry</button>
+                </div>
+            `;
         }
         
         function getCookie(name) {
