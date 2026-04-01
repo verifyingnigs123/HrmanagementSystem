@@ -392,32 +392,43 @@
         // Initialize app
         async function initApp() {
             console.log('Initializing HRMS Mobile Check-in App');
+            console.log('API Base URL:', API_BASE);
             
-            // Update current time
+            // Update current time immediately
             updateCurrentTime();
             setInterval(updateCurrentTime, 1000);
+            console.log('✓ Time update started');
             
             // Get user profile
+            console.log('Loading employee profile...');
             await getUserProfile();
             
             // Get today's attendance
+            console.log('Loading today attendance...');
             await getTodayAttendance();
             
             // Request GPS location
+            console.log('Requesting GPS location...');
             requestGPSLocation();
+            
+            console.log('✓ App initialization complete');
         }
         
         function requestGPSLocation() {
             if (!navigator.geolocation) {
+                console.warn('Geolocation API not supported');
                 showLocationError('⚠️ Geolocation not supported on this device');
                 return;
             }
             
+            console.log('Requesting GPS location with high accuracy...');
             // Try high accuracy first
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     latitude = position.coords.latitude;
                     longitude = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+                    console.log(`✓ GPS acquired: ${latitude.toFixed(4)}, ${longitude.toFixed(4)} (±${accuracy.toFixed(0)}m)`);
                     showLocationInfo(`📍 ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
                 },
                 (error) => {
@@ -430,11 +441,14 @@
         }
         
         function retryGPSWithLowerAccuracy() {
+            console.log('Retrying GPS with lower accuracy...');
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     latitude = position.coords.latitude;
                     longitude = position.coords.longitude;
-                    showLocationInfo(`📍 ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+                    const accuracy = position.coords.accuracy;
+                    console.log(`✓ GPS acquired (low accuracy): ${latitude.toFixed(4)}, ${longitude.toFixed(4)} (±${accuracy.toFixed(0)}m)`);
+                    showLocationInfo(`📍 ${latitude.toFixed(4)}, ${longitude.toFixed(4)} (low accuracy)`);
                 },
                 (error) => {
                     console.warn('GPS low accuracy error:', error.code, error.message);
@@ -455,6 +469,7 @@
                 errorMessage = '⚠️ Location request timed out. Try again or proceed without GPS.';
             }
             
+            console.warn('GPS error:', errorMessage);
             showLocationError(errorMessage);
             showAlert('💡 Tip: Location is optional for check-in', 'info');
         }
@@ -482,12 +497,18 @@
                     currentUser = data.data;
                     document.getElementById('employee-name').textContent = `${currentUser.user.first_name} ${currentUser.user.last_name}`;
                 } else if (response.status === 401) {
-                    showAlert('Please log in first', 'error');
-                    window.location.href = '/';
+                    showAlert('⚠️ Session expired. Please log in again.', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    const errorData = await response.json();
+                    console.error('Profile error:', response.status, errorData);
+                    showAlert(`❌ Failed to load profile (${response.status})`, 'error');
                 }
             } catch (error) {
                 console.error('Profile fetch error:', error);
-                showAlert('Could not load profile', 'error');
+                showAlert('❌ Network error: Could not load profile', 'error');
             }
         }
         
@@ -503,9 +524,17 @@
                     const data = await response.json();
                     todayAttendance = data.data;
                     updateStatusCard();
+                } else {
+                    const errorData = await response.json();
+                    console.error('Attendance error:', response.status, errorData);
+                    // Still update status card with empty attendance
+                    updateStatusCard();
                 }
             } catch (error) {
                 console.error('Attendance fetch error:', error);
+                showAlert('⚠️ Could not load attendance status', 'error');
+                // Still allow check-in/out to function
+                updateStatusCard();
             }
         }
         
@@ -628,15 +657,22 @@
         }
         
         function showAlert(message, type = 'info') {
+            // Log to console
+            const logLevel = type === 'error' ? 'error' : type === 'success' ? 'log' : 'warn';
+            console[logLevel](`[${type.toUpperCase()}] ${message}`);
+            
+            // Show in UI
             const alertsContainer = document.getElementById('alerts');
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
             alert.textContent = message;
             alertsContainer.appendChild(alert);
             
+            // Longer duration for errors
+            const duration = type === 'error' ? 6000 : type === 'info' ? 5000 : 4000;
             setTimeout(() => {
                 alert.remove();
-            }, 4000);
+            }, duration);
         }
         
         function showLocationInfo(message) {
