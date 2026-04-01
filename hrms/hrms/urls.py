@@ -24,6 +24,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('employees/', views.employee_list, name='employee_list'),
     path('employees/<int:pk>/', views.employee_detail, name='employee_detail'),
+    path('forgot-password/', views.forgot_password, name='forgot_password'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('admin/', admin.site.urls),
 ]

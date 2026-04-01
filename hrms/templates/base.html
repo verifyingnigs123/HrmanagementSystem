@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,8 +9,10 @@
     <meta http-equiv="Expires" content="0">
     <title>{% block title %}HR Management System{% endblock %}</title>
     
-    <!-- Favicon - HR Logo -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 45 45'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%232563eb'/><stop offset='100%' style='stop-color:%231e40af'/></linearGradient></defs><circle cx='22.5' cy='22.5' r='21' fill='url(%23grad)'/><path d='M 6 8 L 6 20 M 6 14 L 12 14 M 12 8 L 12 20' stroke='white' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/><path d='M 16 8 L 16 20 M 16 8 L 21 8 Q 23 8 23 10 Q 23 12 21 12 L 16 12 M 21 12 L 23 20' stroke='white' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cstyle%3E.hr-bg%7Bfill:%231877f2%7D.hr-win%7Bfill:white%7D.hr-door%7Bfill:white%7D%3C/style%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='50' class='hr-bg'/%3E%3Crect x='30' y='25' width='40' height='45' fill='none' stroke='white' stroke-width='2.5' rx='2'/%3E%3Cpolygon points='30,25 50,10 70,25' fill='none' stroke='white' stroke-width='2.5'/%3E%3Crect x='35' y='30' width='6' height='6' class='hr-win'/%3E%3Crect x='45' y='30' width='6' height='6' class='hr-win'/%3E%3Crect x='55' y='30' width='6' height='6' class='hr-win'/%3E%3Crect x='65' y='30' width='6' height='6' class='hr-win'/%3E%3Crect x='35' y='42' width='6' height='6' class='hr-win'/%3E%3Crect x='45' y='42' width='6' height='6' class='hr-win'/%3E%3Crect x='55' y='42' width='6' height='6' class='hr-win'/%3E%3Crect x='65' y='42' width='6' height='6' class='hr-win'/%3E%3Crect x='46' y='55' width='8' height='15' class='hr-door'/%3E%3Ccircle cx='52' cy='62' r='1.5' fill='%231877f2'/%3E%3C/svg%3E">
+    <link rel="shortcut icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cstyle%3E.hr-bg%7Bfill:%231877f2%7D.hr-win%7Bfill:white%7D.hr-door%7Bfill:white%7D%3C/style%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='50' class='hr-bg'/%3E%3Crect x='30' y='25' width='40' height='45' fill='none' stroke='white' stroke-width='2.5' rx='2'/%3E%3Cpolygon points='30,25 50,10 70,25' fill='none' stroke='white' stroke-width='2.5'/%3E%3Crect x='35' y='30' width='6' height='6' class='hr-win'/%3E%3Crect x='45' y='30' width='6' height='6' class='hr-win'/%3E%3Crect x='55' y='30' width='6' height='6' class='hr-win'/%3E%3Crect x='65' y='30' width='6' height='6' class='hr-win'/%3E%3Crect x='35' y='42' width='6' height='6' class='hr-win'/%3E%3Crect x='45' y='42' width='6' height='6' class='hr-win'/%3E%3Crect x='55' y='42' width='6' height='6' class='hr-win'/%3E%3Crect x='65' y='42' width='6' height='6' class='hr-win'/%3E%3Crect x='46' y='55' width='8' height='15' class='hr-door'/%3E%3Ccircle cx='52' cy='62' r='1.5' fill='%231877f2'/%3E%3C/svg%3E">
+    <meta name="theme-color" content="#1877f2">
     
     <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -24,299 +27,239 @@
         }
         
         :root {
-            --primary-color: #1a1a1a;
-            --light-bg: #ffffff;
-            --border-color: #e0e0e0;
-            --text-color: #333333;
+            --primary-color: #1877f2;
+            --primary-dark: #065de8;
+            --light-bg: #f0f2f5;
+            --white: #ffffff;
+            --border-color: #ccc;
+            --text-color: #555;
+            --text-secondary: #999;
+            --text-dark: #050505;
         }
         
         body {
-            background-color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
             color: var(--text-color);
             line-height: 1.6;
-            padding-top: 70px;
-            overflow-x: hidden;
+            padding-top: 60px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .content-wrapper {
+            flex: 1;
         }
         
         .navbar {
-            background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            padding: 0.75rem 0;
+            background: var(--white);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem 0;
             border-bottom: 1px solid var(--border-color);
             position: fixed;
             top: 0;
             width: 100%;
             z-index: 1000;
-            min-height: 70px;
         }
         
         .navbar-brand {
-            font-size: 1.2rem;
-            font-weight: 700;
+            font-size: 1.3rem;
+            font-weight: 800;
             color: var(--primary-color) !important;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            min-width: fit-content;
-            flex-shrink: 0;
-            gap: 8px !important;
-        }
-        
-        .navbar-brand span {
-            display: none;
+            letter-spacing: -0.5px;
         }
         
         .navbar-brand i {
-            margin-right: 10px;
-            color: #666666;
+            margin-right: 8px;
         }
         
         .navbar-nav .nav-link {
             color: var(--text-color) !important;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             margin-left: 0.5rem;
-            padding: 0.5rem !important;
-            font-size: 0.95rem;
+            font-weight: 500;
         }
         
         .navbar-nav .nav-link:hover {
-            color: #666666 !important;
-            transform: translateY(-2px);
+            color: var(--primary-color) !important;
         }
         
         /* Dropdown Menu Styling */
         .dropdown-menu {
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-radius: 6px;
-            min-width: 250px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
         }
         
         .dropdown-item {
             color: var(--text-color);
             transition: all 0.2s ease;
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
         }
         
         .dropdown-item:hover {
-            background-color: #f5f5f5;
+            background-color: var(--light-bg);
             color: var(--primary-color);
         }
         
         .dropdown-header {
-            color: var(--primary-color);
+            color: var(--text-dark);
             font-weight: 600;
-            font-size: 0.85rem;
         }
         
         /* Notification Bell */
         .nav-link i.fa-bell {
-            font-size: 1rem;
+            font-size: 1.1rem;
+        }
+
+        
+        
+        .footer-copyright p:last-child {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        
+        /* Responsive Footer */
+        @media (max-width: 768px) {
+            footer {
+                padding: 35px 0 20px 0;
+                margin-top: 50px;
+            }
+            
+            .footer-content {
+                gap: 35px;
+                margin-bottom: 35px;
+            }
+            
+            .footer-section h5 {
+                font-size: 1rem;
+                margin-bottom: 18px;
+                padding-bottom: 10px;
+            }
+            
+            .footer-section ul li {
+                margin-bottom: 12px;
+            }
+            
+            .footer-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+                padding-top: 20px;
+                margin-top: 25px;
+                gap: 15px;
+            }
+            
+            .footer-bottom-right {
+                flex-direction: column;
+                gap: 12px;
+                width: 100%;
+            }
+            
+            .footer-copyright {
+                padding: 25px 0 15px 0;
+                margin-top: 25px;
+            }
+            
+            .footer-copyright p {
+                font-size: 0.9rem;
+                margin: 8px 0;
+            }
+            
+            .footer-social {
+                gap: 10px;
+            }
+            
+            .footer-social a {
+                width: 38px;
+                height: 38px;
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            footer {
+                padding: 25px 0 15px 0;
+                margin-top: 30px;
+            }
+            
+            .footer-content {
+                gap: 25px;
+                margin-bottom: 25px;
+            }
+            
+            .footer-section h5 {
+                font-size: 0.95rem;
+                margin-bottom: 15px;
+            }
+            
+            .footer-copyright {
+                padding: 20px 0 10px 0;
+                margin-top: 20px;
+            }
+            
+            .footer-copyright p {
+                font-size: 0.85rem;
+            }
         }
         
         .nav-link .badge {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             padding: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.6rem;
         }
         
         .container-main {
-            background-color: white;
-            border-radius: 8px;
-            padding: 25px;
-            box-shadow: none;
+            background-color: var(--white);
+            border-radius: 4px;
+            padding: 30px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
-            border: 1px solid var(--border-color);
-            width: 100%;
+            border: 1px solid #ddd;
         }
         
         footer {
-            background: white;
-            color: var(--text-color);
-            padding: 2rem 1rem;
-            margin-top: 5rem;
+            background: var(--white);
+            color: var(--text-secondary);
+            padding: 2rem 0;
+            margin-top: 3rem;
             text-align: center;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.9rem;
+            border-top: 1px solid #ddd;
         }
         
         footer p {
             margin: 0;
+            font-size: 0.9rem;
         }
         
-        /* Tables Responsive */
+        /* Tables Styling */
         .table {
-            font-size: 0.9rem;
+            background: var(--white);
+            border-collapse: collapse;
             margin-bottom: 0;
         }
         
-        .table thead th {
-            padding: 1rem 0.5rem;
-            font-size: 0.85rem;
+        .table thead {
+            background: #f5f6f7;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .table th {
+            color: var(--text-dark);
             font-weight: 600;
+            padding: 12px;
+            text-align: left;
         }
         
-        .table tbody td {
-            padding: 0.75rem 0.5rem;
-            vertical-align: middle;
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
         }
         
-        /* Badge Styling */
-        .badge {
-            font-size: 0.75rem;
-            padding: 0.4rem 0.6rem;
-        }
-        
-        /* Button Responsive */
-        .btn {
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-            white-space: nowrap;
-        }
-        
-        .btn-sm {
-            font-size: 0.8rem;
-            padding: 0.35rem 0.6rem;
-        }
-        
-        /* Tablet and larger (768px and up) */
-        @media (min-width: 768px) {
-            body {
-                padding-top: 80px;
-            }
-            
-            .navbar {
-                padding: 1rem 0;
-                min-height: 80px;
-            }
-            
-            .navbar-brand {
-                font-size: 1.5rem;
-                gap: 12px !important;
-            }
-            
-            .navbar-brand span {
-                display: inline;
-            }
-            
-            .navbar-nav .nav-link {
-                margin-left: 1rem;
-                font-size: 1rem;
-                padding: 0.25rem !important;
-            }
-            
-            .dropdown-menu {
-                min-width: 300px;
-            }
-            
-            .container-main {
-                padding: 40px;
-            }
-            
-            .table {
-                font-size: 1rem;
-            }
-            
-            .table thead th {
-                padding: 1rem;
-                font-size: 0.9rem;
-            }
-            
-            .table tbody td {
-                padding: 0.75rem 1rem;
-            }
-            
-            footer {
-                padding: 3rem 0;
-                font-size: 1rem;
-            }
-        }
-        
-        /* Desktop (1200px and up) */
-        @media (min-width: 1200px) {
-            .container-fluid {
-                padding-left: 2rem;
-                padding-right: 2rem;
-            }
-        }
-        
-        /* Extra Small Devices - Smartphones */
-        @media (max-width: 576px) {
-            body {
-                padding-top: 60px;
-            }
-            
-            .navbar {
-                padding: 0.5rem 0;
-                min-height: 60px;
-            }
-            
-            .navbar-brand {
-                font-size: 1rem;
-                gap: 6px !important;
-            }
-            
-            .navbar-brand span {
-                display: none;
-            }
-            
-            .navbar-brand div {
-                width: 35px !important;
-                height: 35px !important;
-            }
-            
-            .navbar-brand svg {
-                width: 28px !important;
-                height: 28px !important;
-            }
-            
-            .navbar-nav .nav-link {
-                margin-left: 0.25rem;
-                font-size: 0.85rem;
-                padding: 0.3rem 0.4rem !important;
-            }
-            
-            .nav-link i {
-                font-size: 1rem !important;
-            }
-            
-            .dropdown-menu {
-                min-width: 200px;
-                font-size: 0.85rem;
-            }
-            
-            .container-main {
-                padding: 15px;
-                border-radius: 6px;
-            }
-            
-            .table {
-                font-size: 0.8rem;
-            }
-            
-            .table thead th {
-                padding: 0.5rem 0.25rem;
-                font-size: 0.75rem;
-            }
-            
-            .table tbody td {
-                padding: 0.5rem 0.25rem;
-            }
-            
-            .btn {
-                font-size: 0.8rem;
-                padding: 0.35rem 0.7rem;
-            }
-            
-            footer {
-                padding: 1.5rem 0.5rem;
-                font-size: 0.8rem;
-            }
+        .table tbody tr:hover {
+            background-color: #f9f9f9;
         }
     </style>
     
@@ -326,17 +269,8 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid px-5">
-            <a class="navbar-brand d-flex align-items-center" href="/" style="gap: 12px;">
-                <!-- HR Badge Logo -->
-                <div style="width: 45px; height: 45px; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 35 35" fill="none"  style="flex-shrink: 0;">
-                        <!-- H letter -->
-                        <path d="M 6 8 L 6 20 M 6 14 L 12 14 M 12 8 L 12 20" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        <!-- R letter -->
-                        <path d="M 16 8 L 16 20 M 16 8 L 21 8 Q 23 8 23 10 Q 23 12 21 12 L 16 12 M 21 12 L 23 20" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <span class="fw-bold" style="font-size: 1.1rem; color: #1e40af;">HR Management System</span>
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-building"></i> HR Management System
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -425,13 +359,7 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 HR Management System. All rights reserved.</p>
-            <p class="mt-2"><small>Professional Human Resources Management Platform</small></p>
-        </div>
-    </footer>
+
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

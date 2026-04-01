@@ -1,0 +1,802 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - HR Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #1877f2;
+        --light-bg: #f0f2f5;
+        --white: #ffffff;
+        --border-color: #ddd;
+        --text-color: #555;
+    }
+
+    .main-content {
+        background: var(--light-bg);
+    }
+
+    .dashboard-header {
+        background: var(--white);
+        border-bottom: 1px solid var(--border-color);
+        padding: 25px;
+        margin-bottom: 25px;
+        border-radius: 4px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+        color: #050505;
+    }
+
+    .dashboard-header p {
+        font-size: 0.95rem;
+        color: var(--text-color);
+        margin: 0;
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .metric-card {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 20px;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .metric-card:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        border-color: var(--primary-color);
+    }
+
+    .metric-card .metric-label {
+        font-size: 0.85rem;
+        color: var(--text-color);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 8px;
+    }
+
+    .metric-card .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin: 0;
+    }
+
+    .metric-card .metric-icon {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+        opacity: 0.7;
+    }
+
+    .card {
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+        transition: all 0.2s ease;
+        margin-bottom: 20px;
+    }
+
+    .card:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+        background: var(--white);
+        border-bottom: 1px solid var(--border-color);
+        padding: 15px 20px;
+        font-weight: 700;
+        color: #050505;
+        border-radius: 4px 4px 0 0;
+    }
+
+    .card-body {
+        padding: 20px;
+        background: var(--white);
+    }
+
+    .list-group-item {
+        border: none;
+        border-bottom: 1px solid #eee;
+        padding: 15px 0;
+    }
+
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+
+    .list-group-item:hover {
+        background-color: transparent;
+    }
+
+    .badge {
+        padding: 0.4rem 0.6rem;
+        font-weight: 600;
+        border-radius: 3px;
+        font-size: 0.8rem;
+    }
+
+    .badge-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .badge-success {
+        background: #52c41a;
+        color: white;
+    }
+
+    .badge-warning {
+        background: #faad14;
+        color: white;
+    }
+
+    .badge-info {
+        background: #1890ff;
+        color: white;
+    }
+
+    .badge-danger {
+        background: #f5222d;
+        color: white;
+    }
+
+    .table {
+        margin-bottom: 0;
+        font-size: 0.95rem;
+        background: var(--white);
+    }
+
+    .table thead th {
+        background: #f5f6f7;
+        border-bottom: 1px solid var(--border-color);
+        font-weight: 600;
+        color: #050505;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        font-size: 0.85rem;
+        padding: 12px;
+    }
+
+    .table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+        border-bottom: 1px solid #eee;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    .btn-primary {
+        background: var(--primary-color);
+        border: none;
+        padding: 8px 16px;
+        font-weight: 600;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #0a63d6;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(24, 119, 242, 0.3);
+        color: white;
+    }
+
+    .btn-success {
+        background: #52c41a;
+        border: none;
+        padding: 8px 16px;
+        font-weight: 600;
+        border-radius: 4px;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background: #389e0d;
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+        background: #999;
+        border: none;
+        padding: 8px 16px;
+        font-weight: 600;
+        border-radius: 4px;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #777;
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .metrics-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .metric-card .metric-value {
+            font-size: 1.5rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+        transform: translateY(-2px);
+    }
+
+    .profile-card-header {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e5e7eb;
+        margin-bottom: 20px;
+    }
+
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 800;
+    }
+
+    .profile-info h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #1e293b;
+        font-weight: 700;
+    }
+
+    .profile-info p {
+        margin: 3px 0 0 0;
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.3px;
+    }
+
+    .info-value {
+        color: #1e293b;
+        font-weight: 600;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        border: 1px solid #a7f3d0;
+        color: #065f46;
+        border-radius: 8px;
+        padding: 15px;
+    }
+
+    .alert-warning {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 1px solid #fcd34d;
+        color: #78350f;
+        border-radius: 8px;
+        padding: 15px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 20px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .metric-card {
+            padding: 20px;
+        }
+
+        .metric-card .metric-value {
+            font-size: 2rem;
+        }
+
+        .card-body {
+            padding: 15px;
+        }
+
+        .profile-card-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .table {
+            font-size: 0.85rem;
+        }
+
+        .table thead th {
+            padding: 8px;
+        }
+
+        .table tbody td {
+            padding: 8px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-header {
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.3rem;
+        }
+
+        .dashboard-header p {
+            font-size: 0.9rem;
+        }
+
+        .metric-card {
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .metric-card .metric-value {
+            font-size: 1.8rem;
+        }
+
+        .metric-icon {
+            font-size: 2rem;
+        }
+
+        .row > .col-md-3, .row > .col-md-4, .row > .col-md-6, .row > .col-md-12 {
+            margin-bottom: 15px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <h1>
+            {% if role == 'admin' %}
+            👨‍💼 Admin Dashboard
+            {% elif role == 'hradmin' %}
+            👩‍💼 HR Admin Dashboard
+            {% elif role == 'manager' %}
+            👔 Manager Dashboard
+            {% else %}
+            👤 Employee Dashboard
+            {% endif %}
+        </h1>
+        <p>
+            {% if role == 'admin' %}
+            Full System Control & Management
+            {% elif role == 'hradmin' %}
+            Human Resources Management & Analytics
+            {% elif role == 'manager' %}
+            Team Management Dashboard
+            {% else %}
+            Your Profile & Information
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- ADMIN DASHBOARD -->
+    {% if role == 'admin' %}
+    <!-- Admin Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="metric-card">
+                <div class="metric-icon">👥</div>
+                <div class="metric-label">Total Employees</div>
+                <div class="metric-value">{{ total_employees }}</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="metric-card">
+                <div class="metric-icon">✅</div>
+                <div class="metric-label">Active Employees</div>
+                <div class="metric-value">{{ active_employees }}</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="metric-card">
+                <div class="metric-icon">👤</div>
+                <div class="metric-label">System Users</div>
+                <div class="metric-value">{{ total_users }}</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="metric-card">
+                <div class="metric-icon">🏢</div>
+                <div class="metric-label">Departments</div>
+                <div class="metric-value">{{ total_departments }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Role Distribution & System Management -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    📊 Role Distribution
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for role_label, count in role_distribution.items %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ role_label }}</span>
+                            <span class="badge badge-primary">{{ count }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    ⚙️ System Management
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="/admin/" class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">🔧 Django Admin Panel</h6>
+                            <p class="mb-0 small">Manage all system settings and users</p>
+                        </a>
+                        <a href="/admin/employees/employee/" class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">👥 Manage Employees</h6>
+                            <p class="mb-0 small">View and edit employee records</p>
+                        </a>
+                        <a href="/admin/employees/role/" class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">🔑 Manage Roles</h6>
+                            <p class="mb-0 small">Create and modify user roles</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Actions -->
+    <div class="row">
+        <div class="col-md-12">
+            <a href="{% url 'employee_list' %}" class="btn btn-primary btn-lg">
+                📋 View All Employees
+            </a>
+        </div>
+    </div>
+
+    <!-- HR ADMIN DASHBOARD -->
+    {% elif role == 'hradmin' %}
+    <!-- HR Admin Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-4 col-sm-6">
+            <div class="metric-card">
+                <div class="metric-icon">👥</div>
+                <div class="metric-label">Total Employees</div>
+                <div class="metric-value">{{ total_employees }}</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <div class="metric-card">
+                <div class="metric-icon">🏢</div>
+                <div class="metric-label">Departments</div>
+                <div class="metric-value">{{ departments|length }}</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <div class="metric-card">
+                <div class="metric-icon">🆕</div>
+                <div class="metric-label">New Hires This Month</div>
+                <div class="metric-value">{{ new_employees|length }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity & Departments -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    🆕 Recent New Hires
+                </div>
+                <div class="card-body">
+                    {% if new_employees %}
+                    <ul class="list-group list-group-flush">
+                        {% for employee in new_employees %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ employee.user.first_name }} {{ employee.user.last_name }}</strong>
+                                <small class="badge badge-success">{{ employee.position }}</small>
+                            </div>
+                            <small class="text-muted">{{ employee.employee_id }} • {{ employee.department }}</small>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted text-center py-3">No recent hires</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    🏢 Departments
+                </div>
+                <div class="card-body">
+                    {% if departments %}
+                    <ul class="list-group list-group-flush">
+                        {% for dept in departments %}
+                        <li class="list-group-item">{{ dept }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted text-center py-3">No departments</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HR Admin Actions -->
+    <div class="row">
+        <div class="col-md-12">
+            <a href="{% url 'employee_list' %}" class="btn btn-primary">
+                👥 View All Employees
+            </a>
+            <a href="/admin/employees/employee/add/" class="btn btn-success">
+                ➕ Add New Employee
+            </a>
+            <a href="/admin/" class="btn btn-secondary">
+                ⚙️ System Settings
+            </a>
+        </div>
+    </div>
+
+    <!-- MANAGER DASHBOARD -->
+    {% elif role == 'manager' %}
+    <!-- Manager Info & Team Stats -->
+    <div class="row mb-4">
+        <div class="col-md-6 col-sm-12">
+            <div class="metric-card">
+                <div class="metric-icon">🏢</div>
+                <div class="metric-label">Department</div>
+                <div class="metric-value" style="color: #2563eb; font-size: 1.8rem;">{{ department }}</div>
+                <p class="text-muted mt-2">Position: <strong>{{ position }}</strong></p>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12">
+            <div class="metric-card">
+                <div class="metric-icon">👥</div>
+                <div class="metric-label">Team Members</div>
+                <div class="metric-value">{{ team_count }}</div>
+                <p class="text-muted mt-2">Direct reports in {{ department }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Members List -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    👥 Your Team
+                </div>
+                <div class="card-body">
+                    {% if team_members %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Employee ID</th>
+                                    <th>Position</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for member in team_members %}
+                                <tr>
+                                    <td><strong>{{ member.user.first_name }} {{ member.user.last_name }}</strong></td>
+                                    <td>{{ member.employee_id }}</td>
+                                    <td>{{ member.position }}</td>
+                                    <td>
+                                        {% if member.is_active %}
+                                        <span class="badge badge-success">Active</span>
+                                        {% else %}
+                                        <span class="badge badge-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'employee_detail' member.id %}" class="btn btn-sm btn-primary">
+                                            View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-4">No team members in your department</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manager Actions -->
+    <div class="row">
+        <div class="col-md-12">
+            <a href="{% url 'employee_list' %}" class="btn btn-primary">
+                📋 View All Employees
+            </a>
+        </div>
+    </div>
+
+    <!-- EMPLOYEE DASHBOARD -->
+    {% else %}
+    <!-- Employee Profile Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="profile-card-header">
+                        <div class="profile-avatar">
+                            {{ employee.user.first_name|first|upper }}{{ employee.user.last_name|first|upper }}
+                        </div>
+                        <div class="profile-info">
+                            <h3>{{ employee.user.first_name }} {{ employee.user.last_name }}</h3>
+                            <p>{{ employee.position }} • {{ employee.department }}</p>
+                            <p class="text-muted">{{ employee.employee_id }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Profile Information -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="info-label">Full Name</span>
+                                <span class="info-value">{{ employee.user.first_name }} {{ employee.user.last_name }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Employee ID</span>
+                                <span class="info-value">{{ employee.employee_id }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Department</span>
+                                <span class="info-value">{{ employee.department }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Position</span>
+                                <span class="info-value">{{ employee.position }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="info-label">Email</span>
+                                <span class="info-value">{{ employee.user.email }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Phone</span>
+                                <span class="info-value">{{ employee.phone|default:"Not provided" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Hire Date</span>
+                                <span class="info-value">{{ employee.hire_date|date:"M d, Y"|default:"Not provided" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Status</span>
+                                <span class="info-value">
+                                    {% if employee.is_active %}
+                                    <span class="badge badge-success">Active</span>
+                                    {% else %}
+                                    <span class="badge badge-danger">Inactive</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Information -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    📋 Additional Information
+                </div>
+                <div class="card-body">
+                    <div class="info-item">
+                        <span class="info-label">Date of Birth</span>
+                        <span class="info-value">{{ employee.date_of_birth|date:"M d, Y"|default:"Not provided" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Salary</span>
+                        <span class="info-value">{{ employee.salary|default:"Not provided" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    ℹ️ Status Summary
+                </div>
+                <div class="card-body">
+                    {% if employee.is_active %}
+                    <div class="alert alert-success">
+                        ✅ You are currently an active employee
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        ⚠️ Your account is currently inactive
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Actions -->
+    <div class="row">
+        <div class="col-md-12">
+            <button class="btn btn-primary" disabled>
+                ✏️ Edit Profile (Coming Soon)
+            </button>
+            <button class="btn btn-secondary" disabled>
+                🔐 Change Password (Coming Soon)
+            </button>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+{% endblock %}

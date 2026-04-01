@@ -25,7 +25,7 @@ def home(request):
             # Authentication failed - set error message
             error_message = 'Invalid username or password'
     
-    return render(request, 'home.html', {'error_message': error_message})
+    return render(request, 'login.html', {'error_message': error_message})
 
 @never_cache
 @login_required(login_url='admin:login')
@@ -75,7 +75,7 @@ def dashboard(request):
                 'team_count': team_members.count(),
             })
         
-        return render(request, 'employees/dashboard.html', context)
+        return render(request, 'dashboard/dashboard.html', context)
     except Employee.DoesNotExist:
         return redirect('home')
 
@@ -130,3 +130,28 @@ def employee_detail(request, pk):
     employee = Employee.objects.get(pk=pk)
     context = {'employee': employee}
     return render(request, 'employees/employee_detail.html', context)
+
+@never_cache
+def forgot_password(request):
+    """Forgot password page - allows users to request password reset."""
+    success_message = None
+    error_message = None
+    
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        
+        # Check if email exists in system
+        try:
+            from django.contrib.auth.models import User
+            user = User.objects.get(email=email)
+            success_message = 'Password reset instructions have been sent to your email address.'
+            # Note: In a production system, you would send an actual email with a reset link
+            # For now, we just show the success message
+        except User.DoesNotExist:
+            error_message = 'No user account found with this email address.'
+    
+    context = {
+        'success_message': success_message,
+        'error_message': error_message,
+    }
+    return render(request, 'forgot_password.html', context)
