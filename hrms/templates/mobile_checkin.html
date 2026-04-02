@@ -8,6 +8,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="HRMS Check-in">
     <meta name="theme-color" content="#1877f2">
+    <!-- Django CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>HRMS Mobile Check-in</title>
     
     <!-- Apple Touch Icon -->
@@ -582,7 +584,7 @@
             console.log('📤 Sending check-in request:', {
                 url: `${API_BASE}/attendance/check-in/`,
                 data: checkInData,
-                csrfToken: getCookie('csrftoken') ? '✓ Present' : '✗ Missing'
+                csrfToken: getCSRFToken() ? '✓ Present' : '✗ Missing'
             });
             
             try {
@@ -592,7 +594,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
+                        'X-CSRFToken': getCSRFToken()
                     },
                     body: JSON.stringify(checkInData)
                 });
@@ -642,7 +644,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
+                        'X-CSRFToken': getCSRFToken()
                     },
                     body: JSON.stringify({
                         latitude: latitude || null,
@@ -717,6 +719,19 @@
                 }
             }
             return cookieValue;
+        }
+        
+        function getCSRFToken() {
+            // Try to get from meta tag first (more reliable)
+            let token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            
+            // Fallback to cookie if meta tag not found
+            if (!token) {
+                token = getCookie('csrftoken');
+            }
+            
+            console.log('🔐 CSRF Token:', token ? `✓ Found (${token.substring(0, 10)}...)` : '✗ Not found');
+            return token;
         }
         
         // Start app when DOM is ready

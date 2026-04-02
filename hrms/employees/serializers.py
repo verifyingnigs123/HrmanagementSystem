@@ -27,9 +27,9 @@ class AttendanceCheckInSerializer(serializers.Serializer):
     longitude = serializers.FloatField(required=False, allow_null=True)
     notes = serializers.CharField(max_length=500, required=False, allow_blank=True)
     
-    def validate(self):
-        latitude = self.initial_data.get('latitude')
-        longitude = self.initial_data.get('longitude')
+    def validate(self, data):
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
         
         # Only validate if both are provided
         if latitude is not None and longitude is not None:
@@ -37,7 +37,7 @@ class AttendanceCheckInSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Invalid latitude")
             if not (-180 <= longitude <= 180):
                 raise serializers.ValidationError("Invalid longitude")
-        return self.initial_data
+        return data
 
 class AttendanceCheckOutSerializer(serializers.Serializer):
     """For mobile check-out with GPS (GPS is optional)"""
@@ -45,3 +45,15 @@ class AttendanceCheckOutSerializer(serializers.Serializer):
     latitude = serializers.FloatField(required=False, allow_null=True)
     longitude = serializers.FloatField(required=False, allow_null=True)
     notes = serializers.CharField(max_length=500, required=False, allow_blank=True)
+    
+    def validate(self, data):
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
+        
+        # Only validate if both are provided
+        if latitude is not None and longitude is not None:
+            if not (-90 <= latitude <= 90):
+                raise serializers.ValidationError("Invalid latitude")
+            if not (-180 <= longitude <= 180):
+                raise serializers.ValidationError("Invalid longitude")
+        return data

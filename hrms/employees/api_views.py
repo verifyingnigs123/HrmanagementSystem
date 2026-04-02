@@ -95,9 +95,16 @@ def get_today_attendance(request):
 @permission_classes([IsAuthenticated])
 def check_in(request):
     """Mobile check-in endpoint with GPS"""
+    import logging
+    logger = logging.getLogger(__name__)
+    
     try:
+        logger.info(f"Check-in request from user: {request.user.username}")
+        
         employee = Employee.objects.get(user=request.user)
         today = timezone.now().date()
+        
+        logger.info(f"Employee found: {employee.employee_id}")
         
         # Get or create attendance record for today
         attendance, created = Attendance.objects.get_or_create(
@@ -105,6 +112,8 @@ def check_in(request):
             date=today,
             defaults={'status': 'present'}
         )
+        
+        logger.info(f"Attendance record {'created' if created else 'found'} for {today}")
         
         if attendance.check_in_time is not None:
             return Response({
@@ -115,6 +124,7 @@ def check_in(request):
         # Validate GPS coordinates
         serializer = AttendanceCheckInSerializer(data=request.data)
         if not serializer.is_valid():
+            logger.error(f"Serializer validation failed: {serializer.errors}")
             return Response({
                 'success': False,
                 'errors': serializer.errors,
@@ -129,15 +139,16 @@ def check_in(request):
         longitude = request.data.get('longitude')
         
         if latitude and longitude:
-            attendance.check_in_latitude = latitude
-            attendance.check_in_longitude = longitude
-            attendance.notes = f"Check-in GPS: {latitude:.6f}, {longitude:.6f}"
+            attendance.check_in_latitude = float(latitude)
+            attendance.check_in_longitude = float(longitude)
+            attendance.notes = f"Check-in GPS: {float(latitude):.6f}, {float(longitude):.6f}"
             if request.data.get('notes'):
                 attendance.notes += f" - {request.data.get('notes')}"
         else:
             attendance.notes = "Check-in without GPS location"
         
         attendance.save()
+        logger.info(f"Attendance saved successfully at {attendance.check_in_time}")
         
         serializer = AttendanceSerializer(attendance)
         return Response({
@@ -147,9 +158,16 @@ def check_in(request):
         }, status=status.HTTP_201_CREATED)
         
     except Employee.DoesNotExist:
+        logger.error(f"Employee not found for user: {request.user.username}")
         return Response(
-            {'success': False, 'message': 'Employee not found'},
+            {'success': False, 'message': 'Employee profile not found. Please contact admin.'},
             status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        logger.exception(f"Unexpected error in check_in: {str(e)}")
+        return Response(
+            {'success': False, 'message': f'Server error: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
 
@@ -157,7 +175,12 @@ def check_in(request):
 @permission_classes([IsAuthenticated])
 def check_out(request):
     """Mobile check-out endpoint with GPS"""
+    import logging
+    logger = logging.getLogger(__name__)
+    
     try:
+        logger.info(f"Check-out request from user: {request.user.username}")
+        
         employee = Employee.objects.get(user=request.user)
         today = timezone.now().date()
         
@@ -181,6 +204,7 @@ def check_out(request):
         # Validate GPS coordinates
         serializer = AttendanceCheckOutSerializer(data=request.data)
         if not serializer.is_valid():
+            logger.error(f"Checkout serializer validation failed: {serializer.errors}")
             return Response({
                 'success': False,
                 'errors': serializer.errors,
@@ -194,9 +218,9 @@ def check_out(request):
         longitude = request.data.get('longitude')
         
         if latitude and longitude:
-            attendance.check_out_latitude = latitude
-            attendance.check_out_longitude = longitude
-            gps_note = f"Check-out GPS: {latitude:.6f}, {longitude:.6f}"
+            attendance.check_out_latitude = float(latitude)
+            attendance.check_out_longitude = float(longitude)
+            gps_note = f"Check-out GPS: {float(latitude):.6f}, {float(longitude):.6f}"
             if request.data.get('notes'):
                 gps_note += f" - {request.data.get('notes')}"
         else:
@@ -208,6 +232,7 @@ def check_out(request):
             attendance.notes = gps_note
         
         attendance.save()
+        logger.info(f"Checkout saved successfully at {attendance.check_out_time}")
         
         serializer = AttendanceSerializer(attendance)
         return Response({
@@ -217,9 +242,16 @@ def check_out(request):
         }, status=status.HTTP_200_OK)
         
     except Employee.DoesNotExist:
+        logger.error(f"Employee not found for user: {request.user.username}")
         return Response(
-            {'success': False, 'message': 'Employee not found'},
+            {'success': False, 'message': 'Employee profile not found. Please contact admin.'},
             status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        logger.exception(f"Unexpected error in check_out: {str(e)}")
+        return Response(
+            {'success': False, 'message': f'Server error: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
 
