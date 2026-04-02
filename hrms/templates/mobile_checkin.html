@@ -13,9 +13,6 @@
     <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Ccircle cx='90' cy='90' r='90' fill='%231877f2'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='80' font-weight='bold' font-family='Arial'%3EHI%3C/text%3E%3C/svg%3E">
     
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="{% url 'api:manifest' %}">
-    
     <style>
         * {
             margin: 0;
@@ -462,7 +459,7 @@
             let errorMessage = '⚠️ GPS not available';
             
             if (error.code === error.PERMISSION_DENIED) {
-                errorMessage = '⚠️ Location permission denied. Enable in phone settings.';
+                errorMessage = '⚠️ Location permission denied.<br><small>iOS: Settings → Privacy → Location → HRMS</small><br><small>Android: App Info → Permissions → Location</small>';
             } else if (error.code === error.POSITION_UNAVAILABLE) {
                 errorMessage = '⚠️ Your location could not be determined. Try moving to a clear area.';
             } else if (error.code === error.TIMEOUT) {
@@ -470,7 +467,7 @@
             }
             
             console.warn('GPS error:', errorMessage);
-            showLocationError(errorMessage);
+            showLocationError(errorMessage + '<br><button onclick="requestGPSLocation()" style="margin-top:8px; padding:6px 12px; background:#1877f2; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:600;">🔄 Retry Location</button>');
             showAlert('💡 Tip: Location is optional for check-in', 'info');
         }
         
@@ -706,13 +703,6 @@
         
         // Start app when DOM is ready
         document.addEventListener('DOMContentLoaded', initApp);
-        
-        // Register service worker for PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('{% url "api:service_worker" %}')
-                .then(reg => console.log('Service Worker registered'))
-                .catch(err => console.log('Service Worker registration failed:', err));
-        }
     </script>
 </body>
 </html>

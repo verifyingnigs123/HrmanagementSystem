@@ -21,22 +21,27 @@ class AttendanceSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at']
 
 class AttendanceCheckInSerializer(serializers.Serializer):
-    """For mobile check-in with GPS"""
+    """For mobile check-in with GPS (GPS is optional)"""
     check_in_time = serializers.TimeField(required=False)
-    latitude = serializers.FloatField()
-    longitude = serializers.FloatField()
+    latitude = serializers.FloatField(required=False, allow_null=True)
+    longitude = serializers.FloatField(required=False, allow_null=True)
     notes = serializers.CharField(max_length=500, required=False, allow_blank=True)
     
     def validate(self):
-        if not (-90 <= self.initial_data.get('latitude', 0) <= 90):
-            raise serializers.ValidationError("Invalid latitude")
-        if not (-180 <= self.initial_data.get('longitude', 0) <= 180):
-            raise serializers.ValidationError("Invalid longitude")
+        latitude = self.initial_data.get('latitude')
+        longitude = self.initial_data.get('longitude')
+        
+        # Only validate if both are provided
+        if latitude is not None and longitude is not None:
+            if not (-90 <= latitude <= 90):
+                raise serializers.ValidationError("Invalid latitude")
+            if not (-180 <= longitude <= 180):
+                raise serializers.ValidationError("Invalid longitude")
         return self.initial_data
 
 class AttendanceCheckOutSerializer(serializers.Serializer):
-    """For mobile check-out with GPS"""
+    """For mobile check-out with GPS (GPS is optional)"""
     check_out_time = serializers.TimeField(required=False)
-    latitude = serializers.FloatField()
-    longitude = serializers.FloatField()
+    latitude = serializers.FloatField(required=False, allow_null=True)
+    longitude = serializers.FloatField(required=False, allow_null=True)
     notes = serializers.CharField(max_length=500, required=False, allow_blank=True)

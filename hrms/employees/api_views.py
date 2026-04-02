@@ -124,11 +124,18 @@ def check_in(request):
         attendance.check_in_time = timezone.now().time()
         attendance.status = 'present'
         
-        # Store GPS data if provided (you can extend the Attendance model for this)
-        if request.data.get('notes'):
-            attendance.notes = f"GPS: {request.data.get('latitude')}, {request.data.get('longitude')} - {request.data.get('notes')}"
+        # Store GPS data if provided
+        latitude = request.data.get('latitude')
+        longitude = request.data.get('longitude')
+        
+        if latitude and longitude:
+            attendance.check_in_latitude = latitude
+            attendance.check_in_longitude = longitude
+            attendance.notes = f"Check-in GPS: {latitude:.6f}, {longitude:.6f}"
+            if request.data.get('notes'):
+                attendance.notes += f" - {request.data.get('notes')}"
         else:
-            attendance.notes = f"GPS: {request.data.get('latitude')}, {request.data.get('longitude')}"
+            attendance.notes = "Check-in without GPS location"
         
         attendance.save()
         
@@ -182,10 +189,18 @@ def check_out(request):
         # Update attendance record
         attendance.check_out_time = timezone.now().time()
         
-        # Append GPS data to notes
-        gps_note = f"Check-out GPS: {request.data.get('latitude')}, {request.data.get('longitude')}"
-        if request.data.get('notes'):
-            gps_note += f" - {request.data.get('notes')}"
+        # Store GPS data if provided
+        latitude = request.data.get('latitude')
+        longitude = request.data.get('longitude')
+        
+        if latitude and longitude:
+            attendance.check_out_latitude = latitude
+            attendance.check_out_longitude = longitude
+            gps_note = f"Check-out GPS: {latitude:.6f}, {longitude:.6f}"
+            if request.data.get('notes'):
+                gps_note += f" - {request.data.get('notes')}"
+        else:
+            gps_note = "Check-out without GPS location"
         
         if attendance.notes:
             attendance.notes += f"\n{gps_note}"
