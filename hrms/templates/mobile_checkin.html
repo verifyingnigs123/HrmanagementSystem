@@ -573,6 +573,18 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="loading"></span> Checking in...';
             
+            const checkInData = {
+                latitude: latitude || null,
+                longitude: longitude || null,
+                notes: latitude && longitude ? '' : 'Check-in without GPS'
+            };
+            
+            console.log('📤 Sending check-in request:', {
+                url: `${API_BASE}/attendance/check-in/`,
+                data: checkInData,
+                csrfToken: getCookie('csrftoken') ? '✓ Present' : '✗ Missing'
+            });
+            
             try {
                 const response = await fetch(`${API_BASE}/attendance/check-in/`, {
                     method: 'POST',
@@ -582,27 +594,33 @@
                         'Accept': 'application/json',
                         'X-CSRFToken': getCookie('csrftoken')
                     },
-                    body: JSON.stringify({
-                        latitude: latitude || null,
-                        longitude: longitude || null,
-                        notes: latitude && longitude ? '' : 'Check-in without GPS'
-                    })
+                    body: JSON.stringify(checkInData)
                 });
+                
+                console.log('📥 Response status:', response.status, response.statusText);
                 
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('✅ Check-in success:', data);
                     todayAttendance = data.data;
                     updateStatusCard();
                     showAlert('✓ Checked in successfully!', 'success');
                 } else {
-                    const error = await response.json();
-                    showAlert(error.message || 'Check-in failed', 'error');
+                    try {
+                        const error = await response.json();
+                        console.error('Check-in error response:', error);
+                        const errorMsg = error.message || error.errors || JSON.stringify(error) || 'Check-in failed';
+                        showAlert(errorMsg, 'error');
+                    } catch (e) {
+                        console.error('Check-in response error:', response.status, response.statusText);
+                        showAlert(`Check-in failed: ${response.status} ${response.statusText}`, 'error');
+                    }
                     btn.disabled = false;
                     btn.innerHTML = 'CHECK IN';
                 }
             } catch (error) {
                 console.error('Check-in error:', error);
-                showAlert('Network error. Please try again.', 'error');
+                showAlert(`Error: ${error.message || 'Network error. Please try again.'}`, 'error');
                 btn.disabled = false;
                 btn.innerHTML = 'CHECK IN';
             }
