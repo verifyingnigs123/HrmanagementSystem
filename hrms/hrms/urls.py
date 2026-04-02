@@ -33,6 +33,11 @@ urlpatterns = [
     path('forgot-password/', views.forgot_password, name='forgot_password'),
     path('logout/', LogoutView.as_view(), name='logout'),
     
+    # User Management
+    path('users/add/', views.add_user, name='add_user'),
+    path('users/<int:pk>/update/', views.update_user, name='update_user'),
+    path('users/<int:pk>/delete/', views.delete_user, name='delete_user'),
+    
     # Mobile App
     path('mobile/check-in/', views.mobile_checkin, name='mobile_checkin'),
     

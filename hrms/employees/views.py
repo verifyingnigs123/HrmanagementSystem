@@ -430,3 +430,137 @@ def response_json(data, content_type='application/json'):
         content_type=content_type
     )
 
+
+@login_required(login_url='home')
+@require_http_methods(["POST"])
+def add_user(request):
+    """Add a new user to the system."""
+    from .forms import UserCreationForm
+    from django.contrib.auth.models import User
+    
+    try:
+        user_employee = Employee.objects.get(user=request.user)
+        user_role = user_employee.role
+        
+        # Check if user has permission to add users
+        if user_role not in ['admin', 'hradmin']:
+            return JsonResponse({
+                'success': False,
+                'message': 'You do not have permission to add users.'
+            }, status=403)
+        
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            employee = form.save()
+            return JsonResponse({
+                'success': True,
+                'message': f'User {employee.user.first_name} {employee.user.last_name} added successfully!',
+                'employee_id': employee.id,
+                'redirect': request.POST.get('next', '/employees/')
+            })
+        else:
+            errors = {field: error[0] for field, error in form.errors.items()}
+            return JsonResponse({
+                'success': False,
+                'message': 'Form validation failed.',
+                'errors': errors
+            }, status=400)
+    
+    except Employee.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'Employee profile not found.'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Error adding user: {str(e)}'
+        }, status=500)
+
+
+@login_required(login_url='home')
+@require_http_methods(["POST"])
+def update_user(request, pk):
+    """Update an existing user."""
+    from .forms import UserUpdateForm
+    
+    try:
+        user_employee = Employee.objects.get(user=request.user)
+        user_role = user_employee.role
+        
+        # Check if user has permission to update users
+        if user_role not in ['admin', 'hradmin']:
+            return JsonResponse({
+                'success': False,
+                'message': 'You do not have permission to update users.'
+            }, status=403)
+        
+        employee = Employee.objects.get(pk=pk)
+        user = employee.user
+        
+        form = UserUpdateForm(request.POST)
+        if form.is_valid():
+            employee = form.save(user, employee)
+            return JsonResponse({
+                'success': True,
+                'message': f'User {employee.user.first_name} {employee.user.last_name} updated successfully!',
+                'employee_id': employee.id
+            })
+        else:
+            errors = {field: error[0] for field, error in form.errors.items()}
+            return JsonResponse({
+                'success': False,
+                'message': 'Form validation failed.',
+                'errors': errors
+            }, status=400)
+    
+    except Employee.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'Employee not found.'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Error updating user: {str(e)}'
+        }, status=500)
+
+
+@login_required(login_url='home')
+@require_http_methods(["POST"])
+def delete_user(request, pk):
+    """Delete a user from the system."""
+    try:
+        user_employee = Employee.objects.get(user=request.user)
+        user_role = user_employee.role
+        
+        # Check if user has permission to delete users
+        if user_role not in ['admin', 'hradmin']:
+            return JsonResponse({
+                'success': False,
+                'message': 'You do not have permission to delete users.'
+            }, status=403)
+        
+        employee = Employee.objects.get(pk=pk)
+        user = employee.user
+        user_name = f"{user.first_name} {user.last_name}"
+        
+        # Delete the user and employee
+        user.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'User {user_name} deleted successfully!'
+        })
+    
+    except Employee.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'Employee not found.'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Error deleting user: {str(e)}'
+        }, status=500)
+
