@@ -1,0 +1,493 @@
+/**
+ * HR Management System - Reusable Design System
+ * Version 1.0
+ * 
+ * Copy and paste these styles into your projects
+ * Includes: Colors, Typography, Buttons, Forms, Layout, Alerts
+ */
+
+/* ==========================================
+   COLOR PALETTE (CSS VARIABLES)
+   ========================================== */
+
+:root {
+    --primary-color: #1e40af;           /* Dark Blue */
+    --secondary-color: #3b82f6;         /* Light Blue */
+    --light-blue: #e0e7ff;              /* Very Light Blue */
+    --light-gray: #f3f4f6;              /* Light Gray */
+    --dark-text: #1f2937;               /* Dark Gray Text */
+    --gray-text: #6b7280;               /* Medium Gray Text */
+    --border-color: #e5e7eb;            /* Light Border */
+    --success-color: #10b981;           /* Green */
+    --error-color: #ef4444;             /* Red */
+    --warning-color: #f59e0b;           /* Amber */
+}
+
+/* ==========================================
+   PAGE CONTAINER
+   ========================================== */
+
+.design-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* ==========================================
+   CARD LAYOUTS
+   ========================================== */
+
+.design-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.design-two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    max-width: 900px;
+    width: 100%;
+}
+
+.design-column-left {
+    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.design-column-right {
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* ==========================================
+   ICON STYLES
+   ========================================== */
+
+.design-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin: 0 auto 25px;
+    box-shadow: 0 8px 20px rgba(30, 64, 175, 0.3);
+}
+
+/* ==========================================
+   TYPOGRAPHY
+   ========================================== */
+
+.design-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0 0 15px;
+    letter-spacing: -0.5px;
+}
+
+.design-subtitle {
+    font-size: 16px;
+    color: var(--gray-text);
+    margin: 0 0 30px;
+    line-height: 1.6;
+}
+
+.design-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dark-text);
+    margin-bottom: 8px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ==========================================
+   FORM ELEMENTS
+   ========================================== */
+
+.design-form-group {
+    margin-bottom: 18px;
+}
+
+.design-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    color: var(--dark-text);
+}
+
+.design-input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.design-input::placeholder {
+    color: #9ca3af;
+}
+
+.design-input:disabled {
+    background: var(--light-gray);
+    cursor: not-allowed;
+}
+
+.design-input-error {
+    border-color: var(--error-color);
+}
+
+.design-input-error:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.design-textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    color: var(--dark-text);
+    resize: vertical;
+    min-height: 100px;
+}
+
+.design-textarea:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.design-select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    color: var(--dark-text);
+}
+
+.design-select:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.design-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--dark-text);
+}
+
+.design-checkbox input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+}
+
+.design-radio {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--dark-text);
+}
+
+.design-radio input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+}
+
+/* ==========================================
+   BUTTONS
+   ========================================== */
+
+.design-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.design-btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.design-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(30, 64, 175, 0.3);
+}
+
+.design-btn-primary:active {
+    transform: translateY(0);
+}
+
+.design-btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.design-btn-secondary {
+    background: var(--light-gray);
+    color: var(--dark-text);
+    width: 100%;
+    border: 1px solid var(--border-color);
+}
+
+.design-btn-secondary:hover {
+    background: var(--border-color);
+}
+
+.design-btn-secondary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.design-btn-danger {
+    background: var(--error-color);
+    color: white;
+}
+
+.design-btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+.design-btn-success {
+    background: var(--success-color);
+    color: white;
+}
+
+.design-btn-success:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.design-btn-warning {
+    background: var(--warning-color);
+    color: white;
+}
+
+.design-btn-warning:hover {
+    background: #d97706;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+}
+
+.design-btn-link {
+    background: none;
+    color: var(--secondary-color);
+    padding: 0;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.design-btn-link:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+/* ==========================================
+   ALERTS
+   ========================================== */
+
+.design-alert {
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    border-left: 4px solid;
+    line-height: 1.5;
+}
+
+.design-alert-success {
+    background: #dcfce7;
+    color: #166534;
+    border-color: var(--success-color);
+}
+
+.design-alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: var(--error-color);
+}
+
+.design-alert-info {
+    background: #dbeafe;
+    color: #0c4a6e;
+    border-color: var(--secondary-color);
+}
+
+.design-alert-warning {
+    background: #fef3c7;
+    color: #78350f;
+    border-color: var(--warning-color);
+}
+
+/* ==========================================
+   HELPERS
+   ========================================== */
+
+.design-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.design-flex-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.design-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 25px 0;
+}
+
+.design-text-center {
+    text-align: center;
+}
+
+.design-text-right {
+    text-align: right;
+}
+
+.design-text-muted {
+    color: var(--gray-text);
+    font-size: 13px;
+}
+
+.design-text-error {
+    color: var(--error-color);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.design-mt-0 { margin-top: 0; }
+.design-mt-10 { margin-top: 10px; }
+.design-mt-20 { margin-top: 20px; }
+.design-mt-30 { margin-top: 30px; }
+
+.design-mb-0 { margin-bottom: 0; }
+.design-mb-10 { margin-bottom: 10px; }
+.design-mb-20 { margin-bottom: 20px; }
+.design-mb-30 { margin-bottom: 30px; }
+
+.design-p-10 { padding: 10px; }
+.design-p-20 { padding: 20px; }
+.design-p-30 { padding: 30px; }
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+
+@media (max-width: 768px) {
+    .design-two-column {
+        grid-template-columns: 1fr;
+    }
+
+    .design-column-left {
+        padding: 40px 30px;
+    }
+
+    .design-column-right {
+        padding: 40px 30px;
+    }
+
+    .design-title {
+        font-size: 24px;
+    }
+
+    .design-subtitle {
+        font-size: 14px;
+    }
+
+    .design-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 35px;
+    }
+
+    .design-flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .design-container {
+        padding: 10px;
+    }
+
+    .design-card {
+        border-radius: 8px;
+    }
+
+    .design-column-left,
+    .design-column-right {
+        padding: 25px 15px;
+    }
+
+    .design-title {
+        font-size: 20px;
+    }
+
+    .design-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}
