@@ -14,6 +14,15 @@ from .serializers import (
     AttendanceCheckInSerializer,
     AttendanceCheckOutSerializer,
 )
+from .permissions import (
+    IsAdmin,
+    IsHRAdmin,
+    IsManager,
+    IsEmployee,
+    CanManageAttendance,
+    CanManageLeave,
+    CanViewSalary,
+)
 
 # ============ AUTHENTICATION ENDPOINTS ============
 
@@ -55,7 +64,7 @@ def mobile_login(request):
 # ============ ATTENDANCE ENDPOINTS ============
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsEmployee])
 def get_today_attendance(request):
     """Get today's attendance status for the current user"""
     try:
@@ -92,9 +101,9 @@ def get_today_attendance(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsEmployee])
 def check_in(request):
-    """Mobile check-in endpoint with GPS"""
+    """Mobile check-in endpoint with GPS - All employees can check themselves in"""
     import logging
     logger = logging.getLogger(__name__)
     
@@ -172,9 +181,9 @@ def check_in(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsEmployee])
 def check_out(request):
-    """Mobile check-out endpoint with GPS"""
+    """Mobile check-out endpoint with GPS - All employees can check themselves out"""
     import logging
     logger = logging.getLogger(__name__)
     
@@ -256,7 +265,7 @@ def check_out(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsEmployee])
 def get_attendance_history(request):
     """Get attendance history for the current user (last 30 days)"""
     try:
@@ -286,7 +295,7 @@ def get_attendance_history(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsEmployee])
 def get_employee_profile(request):
     """Get current employee profile"""
     try:

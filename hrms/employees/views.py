@@ -4,10 +4,22 @@ from django.contrib.auth import authenticate, login
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.cache import never_cache
 from django.db import models
+from django.http import HttpResponseForbidden
+import logging
+
+logger = logging.getLogger(__name__)
 from .models import (
     Employee, Attendance, LeaveRequest, LeaveType, 
-    SalarySlip, Document, AttendancePolicy, AuditLog
+    SalarySlip, Document, AttendancePolicy, AuditLog, SecurityEventLog
 )
+from .decorators import (
+    admin_required, hr_admin_required, manager_required, 
+    employee_required, get_permission_context
+)
+
+def design_template(request):
+    """Design template showcase - for copying UI design."""
+    return render(request, 'design_template.html')
 
 @never_cache
 def home(request):
@@ -32,7 +44,7 @@ def home(request):
     return render(request, 'login.html', {'error_message': error_message})
 
 @never_cache
-@login_required(login_url='home')
+@employee_required
 def dashboard(request):
     """Unified dashboard - shows different content based on user role."""
     try:
@@ -46,6 +58,9 @@ def dashboard(request):
             'total_employees': Employee.objects.count(),
             'active_employees': Employee.objects.filter(is_active=True).count(),
         }
+        
+        # Add permission context for template
+        context.update(get_permission_context(request))
         
         # Add role-specific data
         if role == 'admin':
@@ -84,9 +99,9 @@ def dashboard(request):
         return redirect('home')
 
 @never_cache
-@login_required(login_url='home')
+@hr_admin_required
 def employee_list(request):
-    """List all employees with admin management features."""
+    """List all employees with admin management features - HR Admin and Super Admin only."""
     try:
         user_employee = Employee.objects.get(user=request.user)
         user_role = user_employee.role
@@ -124,41 +139,206 @@ def employee_list(request):
         'current_status_filter': status_filter,
         'current_department_filter': department_filter,
     }
+    context.update(get_permission_context(request))
     
     return render(request, 'employees/employee_list.html', context)
 
 @never_cache
-@login_required(login_url='home')
+@employee_required
 def employee_detail(request, pk):
-    """View employee details."""
+    """View employee details - users can view self, admins can view all."""
     employee = Employee.objects.get(pk=pk)
-    context = {'employee': employee}
+    
+    # Check if user has permission to view this employee
+    try:
+        user_employee = Employee.objects.get(user=request.user)
+        # Allow viewing if it's their own profile or if they're admin/hr_admin
+        if employee.user != request.user and user_employee.role not in ['admin', 'hradmin']:
+            return HttpResponseForbidden("You do not have permission to view this employee's details.")
+    except Employee.DoesNotExist:
+        return HttpResponseForbidden("Employee profile not found.")
+    
+    context = {
+        'employee': employee,
+        'is_own_profile': employee.user == request.user,
+    }
+    context.update(get_permission_context(request))
     return render(request, 'employees/employee_detail.html', context)
 
 @never_cache
 def forgot_password(request):
     """Forgot password page - allows users to request password reset."""
-    success_message = None
     error_message = None
+    success_message = None
+    email = ''
     
     if request.method == 'POST':
         email = request.POST.get('email')
         
-        # Check if email exists in system
+        # Check if email exists in system and send OTP
         try:
             from django.contrib.auth.models import User
+            from django.core.mail import send_mail
+            from django.conf import settings
+            import secrets
+            import string
+            
             user = User.objects.get(email=email)
-            success_message = 'Password reset instructions have been sent to your email address.'
-            # Note: In a production system, you would send an actual email with a reset link
-            # For now, we just show the success message
+            
+            # Generate 6-digit OTP
+            otp_code = ''.join(secrets.choice(string.digits) for _ in range(6))
+            
+            # Store OTP in SecurityEventLog temporarily
+            otp_event = SecurityEventLog.objects.create(
+                user=user,
+                event_type='password_reset_otp',
+                description=f'Password reset OTP: {otp_code}',
+                severity='medium',
+                ip_address=request.META.get('REMOTE_ADDR', ''),
+            )
+            
+            print(f"[OTP Debug] Generated OTP for {user.email}: {otp_code}")
+            
+            # Send email with OTP - clean formatting
+            subject = 'Password Reset Request - Your OTP Code'
+            message = f"Dear {user.first_name or user.username},\n\nYou requested a password reset.\n\nYour One-Time Password (OTP) is:\n\n{otp_code}\n\nThis OTP is valid for 15 minutes. Do not share this code with anyone.\n\nIf you did not request a password reset, please ignore this email.\n\n---\nHR Management System"
+            html_message = f"""
+<html>
+  <body style="font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+      <h2 style="color: #333; margin-bottom: 20px;">Password Reset Request</h2>
+      <p style="color: #666; margin-bottom: 10px;">Dear {user.first_name or user.username},</p>
+      <p style="color: #666; margin-bottom: 20px;">You requested a password reset. Your One-Time Password (OTP) is:</p>
+      
+      <div style="background-color: #f0f0f0; padding: 15px; border-left: 4px solid #2563eb; margin: 20px 0;">
+        <h1 style="color: #2563eb; margin: 0; letter-spacing: 2px; font-size: 32px; text-align: center;">{otp_code}</h1>
+      </div>
+      
+      <p style="color: #999; font-size: 12px; margin-top: 20px;">This OTP is valid for 15 minutes. Do not share this code with anyone.</p>
+      <p style="color: #999; font-size: 12px;">If you did not request a password reset, please ignore this email.</p>
+      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+      <p style="color: #999; font-size: 11px; text-align: center;">HR Management System</p>
+    </div>
+  </body>
+</html>
+            """
+            
+            # Try to send email
+            try:
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    html_message=html_message,
+                    fail_silently=False,
+                )
+                
+                print(f"[OTP Debug] Email sent successfully to {user.email}")
+                logger.info(f"Password reset OTP email sent to {user.email}")
+                
+                # Redirect to verify OTP page
+                return redirect(f'/verify-otp/?email={email}')
+                
+            except Exception as e:
+                print(f"[OTP Debug] Email Error: {str(e)}")
+                logger.error(f"Failed to send password reset email to {user.email}: {str(e)}")
+                error_message = f'Failed to send email. Please try again or contact support.'
+                
         except User.DoesNotExist:
-            error_message = 'No user account found with this email address.'
+            # Don't reveal if email exists (security) - show as success message
+            print(f"[OTP Debug] Email not found: {email}")
+            success_message = 'If an account exists with that email, a password reset OTP has been sent. Please check your email.'
+        except Exception as e:
+            print(f"[OTP Debug] Unexpected Error: {str(e)}")
+            logger.error(f"Error in password reset request: {str(e)}")
+            error_message = f'An error occurred. Please try again.'
+    
+    context = {
+        'error_message': error_message,
+        'success_message': success_message,
+        'email': email,
+    }
+    return render(request, 'forgot_password.html', context)
+
+
+@never_cache
+def verify_otp(request):
+    """Verify OTP and reset password."""
+    success_message = None
+    error_message = None
+    email = request.GET.get('email', '')
+    
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        otp_code = request.POST.get('otp_code', '').strip()
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        from django.contrib.auth.models import User
+        from django.utils import timezone
+        from datetime import timedelta
+        from .security_utils import SecurityValidator
+        
+        # Validate all required fields
+        if not otp_code or not new_password or not confirm_password:
+            error_message = 'All fields are required'
+        elif new_password != confirm_password:
+            error_message = 'Passwords do not match'
+        else:
+            # Validate password strength
+            is_strong, strength_message = SecurityValidator.validate_password_strength(new_password)
+            if not is_strong:
+                error_message = strength_message
+            else:
+                # Find user
+                try:
+                    user = User.objects.get(email=email)
+                    
+                    # Verify OTP
+                    otp_event = SecurityEventLog.objects.filter(
+                        user=user,
+                        event_type='password_reset_otp',
+                        created_at__gte=timezone.now() - timedelta(minutes=15)
+                    ).order_by('-created_at').first()
+                    
+                    if not otp_event:
+                        error_message = 'OTP has expired. Please request a new password reset.'
+                    else:
+                        # Extract OTP from description
+                        stored_otp = otp_event.description.split(': ')[-1]
+                        
+                        if stored_otp != otp_code:
+                            error_message = 'Invalid OTP code'
+                        else:
+                            # Reset password
+                            user.set_password(new_password)
+                            user.save()
+                            
+                            # Mark OTP as used
+                            otp_event.severity = 'low'
+                            otp_event.save()
+                            
+                            # Log the password reset
+                            SecurityEventLog.objects.create(
+                                user=user,
+                                event_type='password_reset_successful',
+                                description='Password successfully reset via OTP verification',
+                                severity='medium'
+                            )
+                            
+                            success_message = 'Password has been reset successfully! You can now login with your new password.'
+                            email = ''  # Clear email after successful reset
+                            
+                except User.DoesNotExist:
+                    error_message = 'User not found'
     
     context = {
         'success_message': success_message,
         'error_message': error_message,
+        'email': email,
     }
-    return render(request, 'forgot_password.html', context)
+    return render(request, 'verify_otp.html', context)
 
 
 @never_cache
