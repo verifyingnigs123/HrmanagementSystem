@@ -5,450 +5,233 @@
 {% block extra_css %}
 <style>
     :root {
-        --primary-color: #1877f2;
-        --light-bg: #f0f2f5;
-        --white: #ffffff;
-        --border-color: #ddd;
-        --text-color: #555;
+        --primary-blue: #1e40af;
+        --secondary-blue: #3b82f6;
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.4);
+        --text-main: #1e293b;
+        --text-muted: #64748b;
     }
 
-    .main-content {
-        background: var(--light-bg);
+    body {
+        background: linear-gradient(135deg, #c7d9e8 0%, #d4d9e6 50%, #d8dce6 100%);
+        min-height: 100vh;
+        position: relative;
     }
 
+    /* Blurred background logo - Building SVG */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 600px;
+        height: 600px;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120"><defs><linearGradient id="bldg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%233b82f6;stop-opacity:1" /><stop offset="100%" style="stop-color:%231e40af;stop-opacity:1" /></linearGradient></defs><rect x="15" y="20" width="70" height="95" fill="url(%23bldg)" rx="3"/><rect x="22" y="30" width="10" height="10" fill="%23bfdbfe" /><rect x="38" y="30" width="10" height="10" fill="%23bfdbfe" /><rect x="54" y="30" width="10" height="10" fill="%23bfdbfe" /><rect x="22" y="46" width="10" height="10" fill="%23bfdbfe" /><rect x="38" y="46" width="10" height="10" fill="%23bfdbfe" /><rect x="54" y="46" width="10" height="10" fill="%23bfdbfe" /><rect x="22" y="62" width="10" height="10" fill="%23bfdbfe" /><rect x="38" y="62" width="10" height="10" fill="%23bfdbfe" /><rect x="54" y="62" width="10" height="10" fill="%23bfdbfe" /><rect x="22" y="78" width="10" height="10" fill="%23bfdbfe" /><rect x="38" y="78" width="10" height="10" fill="%23bfdbfe" /><rect x="54" y="78" width="10" height="10" fill="%23bfdbfe" /></svg>') center/contain no-repeat;
+        opacity: 0.25;
+        filter: blur(30px);
+        pointer-events: none;
+        z-index: 0;
+        user-select: none;
+    }
+
+    /* Floating background elements */
+    body::after {
+        content: '';
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        right: -50px;
+        top: -50px;
+        animation: float 6s ease-in-out infinite;
+        z-index: -1;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(20px); }
+    }
+
+    /* Glassmorphism Card Style */
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.12);
+    }
+
+    /* Header Styling */
     .dashboard-header {
-        background: var(--white);
-        border-bottom: 1px solid var(--border-color);
-        padding: 8px;
-        margin: 0;
-        border-radius: 0;
+        padding: 30px 0;
+        margin-bottom: 10px;
     }
 
     .dashboard-header h1 {
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin: 0;
-        color: #050505;
+        font-weight: 800;
+        color: var(--primary-blue);
+        letter-spacing: -0.5px;
     }
 
-    .dashboard-header p {
-        font-size: 0.95rem;
-        color: var(--text-color);
-        margin: 0;
-    }
-
-    .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 0;
-        margin: 0;
-    }
-
+    /* Metric Cards */
     .metric-card {
-        background: var(--white);
-        border: 1px solid var(--border-color);
-        border-radius: 0;
-        padding: 10px;
-        transition: all 0.2s ease;
-        box-shadow: none;
-        border-right: none;
-        border-bottom: none;
+        padding: 24px;
+        text-align: left;
     }
 
-    .metric-card:hover {
-        box-shadow: none;
-        border-color: var(--primary-color);
-    }
-
-    .metric-card .metric-label {
-        font-size: 0.85rem;
-        color: var(--text-color);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        margin-bottom: 8px;
-    }
-
-    .metric-card .metric-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--primary-color);
-        margin: 0;
-    }
-
-    .metric-card .metric-icon {
-        font-size: 1.8rem;
-        margin-bottom: 10px;
-        opacity: 0.7;
-    }
-
-    .card {
-        border: 1px solid var(--border-color);
-        border-radius: 0;
-        box-shadow: none;
-        transition: all 0.2s ease;
-        margin: 0;
-    }
-
-    .card:hover {
-        box-shadow: none;
-    }
-
-    .card-header {
-        background: var(--white);
-        border-bottom: 1px solid var(--border-color);
-        padding: 8px 10px;
-        font-weight: 700;
-        color: #050505;
-        border-radius: 0;
-    }
-
-    .card-body {
-        padding: 10px;
-        background: var(--white);
-    }
-
-    .list-group-item {
-        border: none;
-        border-bottom: 1px solid #eee;
-        padding: 6px 0;
-    }
-
-    .list-group-item:last-child {
-        border-bottom: none;
-    }
-
-    .list-group-item:hover {
-        background-color: transparent;
-    }
-
-    .badge {
-        padding: 0.4rem 0.6rem;
-        font-weight: 600;
-        border-radius: 3px;
-        font-size: 0.8rem;
-    }
-
-    .badge-primary {
-        background: var(--primary-color);
-        color: white;
-    }
-
-    .badge-success {
-        background: #52c41a;
-        color: white;
-    }
-
-    .badge-warning {
-        background: #faad14;
-        color: white;
-    }
-
-    .badge-info {
-        background: #1890ff;
-        color: white;
-    }
-
-    .badge-danger {
-        background: #f5222d;
-        color: white;
-    }
-
-    .table {
-        margin-bottom: 0;
-        font-size: 0.95rem;
-        background: var(--white);
-    }
-
-    .table thead th {
-        background: #f5f6f7;
-        border-bottom: 1px solid var(--border-color);
-        font-weight: 600;
-        color: #050505;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        font-size: 0.85rem;
-        padding: 12px;
-    }
-
-    .table tbody td {
-        padding: 12px;
-        vertical-align: middle;
-        border-bottom: 1px solid #eee;
-    }
-
-    .table tbody tr:hover {
-        background-color: #f9f9f9;
-    }
-
-    .btn-primary {
-        background: var(--primary-color);
-        border: none;
-        padding: 8px 16px;
-        font-weight: 600;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #0a63d6;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 6px rgba(24, 119, 242, 0.3);
-        color: white;
-    }
-
-    .btn-success {
-        background: #52c41a;
-        border: none;
-        padding: 8px 16px;
-        font-weight: 600;
-        border-radius: 4px;
-        color: white;
-    }
-
-    .btn-success:hover {
-        background: #389e0d;
-        transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-        background: #999;
-        border: none;
-        padding: 8px 16px;
-        font-weight: 600;
-        border-radius: 4px;
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background: #777;
-        color: white;
-    }
-
-    @media (max-width: 768px) {
-        .metrics-grid {
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-        }
-
-        .metric-card .metric-value {
-            font-size: 1.5rem;
-        }
-
-        .dashboard-header h1 {
-            font-size: 1.5rem;
-        }
-    }
-
-    .metric-card:hover {
-        transform: translateY(-2px);
-    }
-
-    .profile-card-header {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        padding-bottom: 20px;
-        border-bottom: 2px solid #e5e7eb;
-        margin-bottom: 20px;
-    }
-
-    .profile-avatar {
-        width: 80px;
-        height: 80px;
+    .metric-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(59, 130, 246, 0.1);
         border-radius: 12px;
-        background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        font-size: 2.5rem;
-        font-weight: 800;
-    }
-
-    .profile-info h3 {
-        margin: 0;
         font-size: 1.5rem;
-        color: #1e293b;
-        font-weight: 700;
+        margin-bottom: 15px;
     }
 
-    .profile-info p {
-        margin: 3px 0 0 0;
-        color: #64748b;
-        font-size: 0.95rem;
-    }
-
-    .info-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    .info-item:last-child {
-        border-bottom: none;
-    }
-
-    .info-label {
-        font-weight: 600;
-        color: #64748b;
+    .metric-label {
+        font-size: 0.75rem;
         text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 0.3px;
+        font-weight: 700;
+        color: var(--text-muted);
+        letter-spacing: 1px;
     }
 
-    .info-value {
-        color: #1e293b;
+    .metric-value {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    /* List & Table Styling */
+    .card-header {
+        background: transparent;
+        border-bottom: 1px solid var(--glass-border);
+        padding: 18px 24px;
+        font-weight: 700;
+        color: var(--primary-blue);
+        font-size: 1.1rem;
+    }
+
+    .list-group-item {
+        background: transparent;
+        border-color: rgba(0,0,0,0.05);
+        padding: 12px 24px;
+    }
+
+    .badge-pro {
+        background: var(--primary-blue);
+        color: white;
+        border-radius: 8px;
+        padding: 6px 12px;
         font-weight: 600;
     }
 
-    .alert-success {
-        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-        border: 1px solid #a7f3d0;
-        color: #065f46;
-        border-radius: 8px;
-        padding: 15px;
+    /* Action Buttons */
+    .btn-pro {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-weight: 600;
+        transition: all 0.3s ease;
     }
 
-    .alert-warning {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        border: 1px solid #fcd34d;
-        color: #78350f;
-        border-radius: 8px;
-        padding: 15px;
+    .btn-pro:hover {
+        background: var(--secondary-blue);
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        color: white;
     }
 
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .dashboard-header {
-            padding: 20px;
-        }
-
-        .dashboard-header h1 {
-            font-size: 1.5rem;
-        }
-
-        .metric-card {
-            padding: 20px;
-        }
-
-        .metric-card .metric-value {
-            font-size: 2rem;
-        }
-
-        .card-body {
-            padding: 15px;
-        }
-
-        .profile-card-header {
-            flex-direction: column;
-            text-align: center;
-        }
-
-        .table {
-            font-size: 0.85rem;
-        }
-
-        .table thead th {
-            padding: 8px;
-        }
-
-        .table tbody td {
-            padding: 8px;
-        }
+    .btn-pro-outline {
+        background: transparent;
+        border: 2px solid var(--primary-blue);
+        color: var(--primary-blue);
+        border-radius: 12px;
+        padding: 10px 22px;
+        font-weight: 600;
     }
 
-    @media (max-width: 480px) {
-        .dashboard-header {
-            padding: 15px;
-            margin-bottom: 20px;
-        }
+    /* Ensure content is above background */
+    .container {
+        position: relative;
+        z-index: 1;
+        max-width: 100%;
+        padding: 40px 40px 40px 40px;
+        margin: 0;
+    }
 
-        .dashboard-header h1 {
-            font-size: 1.3rem;
-        }
+    .dashboard-header {
+        margin-bottom: 30px;
+    }
 
-        .dashboard-header p {
-            font-size: 0.9rem;
-        }
+    .dashboard-header h1 {
+        font-size: 2rem;
+        margin: 0 0 8px 0;
+    }
 
-        .metric-card {
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .metric-card .metric-value {
-            font-size: 1.8rem;
-        }
-
-        .metric-icon {
-            font-size: 2rem;
-        }
-
-        .row > .col-md-3, .row > .col-md-4, .row > .col-md-6, .row > .col-md-12 {
-            margin-bottom: 15px;
-        }
+    .dashboard-header p {
+        margin: 0;
+        font-size: 0.95rem;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <!-- Dashboard Header -->
-    <div class="dashboard-header">
-        <h1>
-            {% if role == 'admin' %}
-            👨‍💼 Admin Dashboard
-            {% elif role == 'hradmin' %}
-            👩‍💼 HR Admin Dashboard
-            {% elif role == 'manager' %}
-            👔 Manager Dashboard
-            {% else %}
-            👤 Employee Dashboard
-            {% endif %}
-        </h1>
-        <p>
-            {% if role == 'admin' %}
-            Full System Control & Management
-            {% elif role == 'hradmin' %}
-            Human Resources Management & Analytics
-            {% elif role == 'manager' %}
-            Team Management Dashboard
-            {% else %}
-            Your Profile & Information
-            {% endif %}
-        </p>
-    </div>
-
+<div class="container">
     <!-- ADMIN DASHBOARD -->
     {% if role == 'admin' %}
-    <!-- Admin Metrics -->
+    <div class="dashboard-header">
+        <div class="d-flex align-items-center mb-4">
+            <div style="font-size: 3rem; margin-right: 20px;">🏢</div>
+            <div>
+                <h1>Admin Dashboard</h1>
+                <p class="text-muted mb-0">Full System Control & Management</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metrics Row -->
     <div class="row mb-4">
-        <div class="col-md-3 col-sm-6">
-            <div class="metric-card">
+        <div class="col-md-3">
+            <div class="glass-card metric-card">
                 <div class="metric-icon">👥</div>
                 <div class="metric-label">Total Employees</div>
                 <div class="metric-value">{{ total_employees }}</div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="metric-card">
+        <div class="col-md-3">
+            <div class="glass-card metric-card">
                 <div class="metric-icon">✅</div>
                 <div class="metric-label">Active Employees</div>
                 <div class="metric-value">{{ active_employees }}</div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="metric-card">
+        <div class="col-md-3">
+            <div class="glass-card metric-card">
                 <div class="metric-icon">👤</div>
                 <div class="metric-label">System Users</div>
                 <div class="metric-value">{{ total_users }}</div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="metric-card">
+        <div class="col-md-3">
+            <div class="glass-card metric-card">
                 <div class="metric-icon">🏢</div>
                 <div class="metric-label">Departments</div>
                 <div class="metric-value">{{ total_departments }}</div>
@@ -456,19 +239,17 @@
         </div>
     </div>
 
-    <!-- Role Distribution & System Management -->
-    <div class="row mb-4">
+    <!-- Content Cards -->
+    <div class="row">
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    📊 Role Distribution
-                </div>
-                <div class="card-body">
+            <div class="glass-card">
+                <div class="card-header">📊 Role Distribution</div>
+                <div class="card-body p-0">
                     <ul class="list-group list-group-flush">
                         {% for role_label, count in role_distribution.items %}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span>{{ role_label }}</span>
-                            <span class="badge badge-primary">{{ count }}</span>
+                            <span class="badge-pro">{{ count }}</span>
                         </li>
                         {% endfor %}
                     </ul>
@@ -477,168 +258,176 @@
         </div>
         
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    ⚙️ System Management
-                </div>
+            <div class="glass-card">
+                <div class="card-header">⚙️ System Management</div>
                 <div class="card-body">
-                    <div class="list-group">
-                        <a href="/admin/" class="list-group-item list-group-item-action">
-                            <h6 class="mb-1">🔧 Django Admin Panel</h6>
-                            <p class="mb-0 small">Manage all system settings and users</p>
-                        </a>
-                        <a href="/admin/employees/employee/" class="list-group-item list-group-item-action">
-                            <h6 class="mb-1">👥 Manage Employees</h6>
-                            <p class="mb-0 small">View and edit employee records</p>
-                        </a>
-                        <a href="/admin/employees/role/" class="list-group-item list-group-item-action">
-                            <h6 class="mb-1">🔑 Manage Roles</h6>
-                            <p class="mb-0 small">Create and modify user roles</p>
-                        </a>
+                    <a href="/admin/" class="d-block mb-3 text-decoration-none">
+                        <div style="padding: 15px; border-radius: 12px; background: rgba(30, 64, 175, 0.1); cursor: pointer;">
+                            <h6 class="mb-1" style="color: var(--primary-blue); font-weight: 700;">🔧 Django Admin Panel</h6>
+                            <small style="color: var(--text-muted);">Manage all system settings</small>
+                        </div>
+                    </a>
+                    <a href="/admin/employees/employee/" class="d-block mb-3 text-decoration-none">
+                        <div style="padding: 15px; border-radius: 12px; background: rgba(30, 64, 175, 0.1); cursor: pointer;">
+                            <h6 class="mb-1" style="color: var(--primary-blue); font-weight: 700;">👥 Manage Employees</h6>
+                            <small style="color: var(--text-muted);">View and edit employee records</small>
+                        </div>
+                    </a>
+                    <a href="{% url 'employee_list' %}" class="d-block text-decoration-none">
+                        <div style="padding: 15px; border-radius: 12px; background: rgba(30, 64, 175, 0.1); cursor: pointer;">
+                            <h6 class="mb-1" style="color: var(--primary-blue); font-weight: 700;">📋 All Employees</h6>
+                            <small style="color: var(--text-muted);">View employee directory</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HR ADMIN DASHBOARD -->
+    {% elif role == 'hradmin' %}
+    <div class="dashboard-header">
+        <div class="d-flex align-items-center mb-4">
+            <div style="font-size: 3rem; margin-right: 20px;">👩‍💼</div>
+            <div>
+                <h1>HR Admin Dashboard</h1>
+                <p class="text-muted mb-0">Human Resources Management & Analytics</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- HR Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="glass-card metric-card">
+                <div class="metric-icon">👥</div>
+                <div class="metric-label">Total Employees</div>
+                <div class="metric-value">{{ total_employees }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-card metric-card">
+                <div class="metric-icon">🏢</div>
+                <div class="metric-label">Departments</div>
+                <div class="metric-value">{{ departments|length }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-card metric-card">
+                <div class="metric-icon">🆕</div>
+                <div class="metric-label">New Hires</div>
+                <div class="metric-value">{{ new_employees|length }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HR Content -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="glass-card">
+                <div class="card-header">🆕 Recent New Hires</div>
+                <div class="card-body p-0">
+                    {% if new_employees %}
+                    <ul class="list-group list-group-flush">
+                        {% for employee in new_employees %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ employee.user.first_name }} {{ employee.user.last_name }}</h6>
+                                    <small class="text-muted">{{ employee.position }}</small>
+                                </div>
+                                <span class="badge-pro">{{ employee.employee_id }}</span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted text-center py-4">No recent hires</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="glass-card">
+                <div class="card-header">🏢 Departments</div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                        {% if departments %}
+                            {% for dept in departments %}
+                            <div style="padding: 12px; border-radius: 10px; background: rgba(30, 64, 175, 0.08); text-align: center;">
+                                <small style="color: var(--text-main); font-weight: 600;">{{ dept }}</small>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <p class="text-muted col-12">No departments</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Admin Actions -->
-    <div class="row">
+    <div class="row mt-4">
         <div class="col-md-12">
-            <a href="{% url 'employee_list' %}" class="btn btn-primary btn-lg">
-                📋 View All Employees
-            </a>
-        </div>
-    </div>
-
-    <!-- HR ADMIN DASHBOARD -->
-    {% elif role == 'hradmin' %}
-    <!-- HR Admin Metrics -->
-    <div class="row mb-4">
-        <div class="col-md-4 col-sm-6">
-            <div class="metric-card">
-                <div class="metric-icon">👥</div>
-                <div class="metric-label">Total Employees</div>
-                <div class="metric-value">{{ total_employees }}</div>
-            </div>
-        </div>
-        <div class="col-md-4 col-sm-6">
-            <div class="metric-card">
-                <div class="metric-icon">🏢</div>
-                <div class="metric-label">Departments</div>
-                <div class="metric-value">{{ departments|length }}</div>
-            </div>
-        </div>
-        <div class="col-md-4 col-sm-6">
-            <div class="metric-card">
-                <div class="metric-icon">🆕</div>
-                <div class="metric-label">New Hires This Month</div>
-                <div class="metric-value">{{ new_employees|length }}</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Activity & Departments -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    🆕 Recent New Hires
-                </div>
+            <div class="glass-card">
+                <div class="card-header">⚡ Quick Actions</div>
                 <div class="card-body">
-                    {% if new_employees %}
-                    <ul class="list-group list-group-flush">
-                        {% for employee in new_employees %}
-                        <li class="list-group-item">
-                            <div class="d-flex justify-content-between">
-                                <strong>{{ employee.user.first_name }} {{ employee.user.last_name }}</strong>
-                                <small class="badge badge-success">{{ employee.position }}</small>
-                            </div>
-                            <small class="text-muted">{{ employee.employee_id }} • {{ employee.department }}</small>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p class="text-muted text-center py-3">No recent hires</p>
-                    {% endif %}
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="{% url 'employee_list' %}" class="btn btn-pro w-100">👥 View All Employees</a>
+                        <a href="/admin/employees/employee/add/" class="btn btn-pro w-100">➕ Add New Employee</a>
+                        <a href="/admin/" class="btn btn-pro w-100">⚙️ System Settings</a>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    🏢 Departments
-                </div>
-                <div class="card-body">
-                    {% if departments %}
-                    <ul class="list-group list-group-flush">
-                        {% for dept in departments %}
-                        <li class="list-group-item">{{ dept }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p class="text-muted text-center py-3">No departments</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- HR Admin Actions -->
-    <div class="row">
-        <div class="col-md-12">
-            <a href="{% url 'employee_list' %}" class="btn btn-primary">
-                👥 View All Employees
-            </a>
-            <a href="/admin/employees/employee/add/" class="btn btn-success">
-                ➕ Add New Employee
-            </a>
-            <a href="/admin/" class="btn btn-secondary">
-                ⚙️ System Settings
-            </a>
         </div>
     </div>
 
     <!-- MANAGER DASHBOARD -->
     {% elif role == 'manager' %}
-    <!-- Manager Info & Team Stats -->
-    <div class="row mb-4">
-        <div class="col-md-6 col-sm-12">
-            <div class="metric-card">
-                <div class="metric-icon">🏢</div>
-                <div class="metric-label">Department</div>
-                <div class="metric-value" style="color: #2563eb; font-size: 1.8rem;">{{ department }}</div>
-                <p class="text-muted mt-2">Position: <strong>{{ position }}</strong></p>
-            </div>
-        </div>
-        <div class="col-md-6 col-sm-12">
-            <div class="metric-card">
-                <div class="metric-icon">👥</div>
-                <div class="metric-label">Team Members</div>
-                <div class="metric-value">{{ team_count }}</div>
-                <p class="text-muted mt-2">Direct reports in {{ department }}</p>
+    <div class="dashboard-header">
+        <div class="d-flex align-items-center mb-4">
+            <div style="font-size: 3rem; margin-right: 20px;">👔</div>
+            <div>
+                <h1>Manager Dashboard</h1>
+                <p class="text-muted mb-0">Team Management & Oversight</p>
             </div>
         </div>
     </div>
 
-    <!-- Team Members List -->
+    <!-- Manager Metrics -->
     <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="glass-card metric-card">
+                <div class="metric-icon">🏢</div>
+                <div class="metric-label">Department</div>
+                <div class="metric-value" style="font-size: 1.8rem;">{{ department }}</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="glass-card metric-card">
+                <div class="metric-icon">👥</div>
+                <div class="metric-label">Team Members</div>
+                <div class="metric-value">{{ team_count }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Members -->
+    <div class="row">
         <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    👥 Your Team
-                </div>
-                <div class="card-body">
+            <div class="glass-card">
+                <div class="card-header">👥 Your Team</div>
+                <div class="card-body p-0">
                     {% if team_members %}
                     <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
+                        <table class="table table-hover mb-0">
+                            <thead style="background: rgba(30, 64, 175, 0.08);">
                                 <tr>
                                     <th>Name</th>
                                     <th>Employee ID</th>
                                     <th>Position</th>
                                     <th>Status</th>
-                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -649,15 +438,10 @@
                                     <td>{{ member.position }}</td>
                                     <td>
                                         {% if member.is_active %}
-                                        <span class="badge badge-success">Active</span>
+                                        <span class="badge-pro" style="background: #10b981;">Active</span>
                                         {% else %}
-                                        <span class="badge badge-danger">Inactive</span>
+                                        <span class="badge-pro" style="background: #ef4444;">Inactive</span>
                                         {% endif %}
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'employee_detail' member.id %}" class="btn btn-sm btn-primary">
-                                            View
-                                        </a>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -665,75 +449,46 @@
                         </table>
                     </div>
                     {% else %}
-                    <p class="text-muted text-center py-4">No team members in your department</p>
+                    <p class="text-muted text-center py-4">No team members</p>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Manager Actions -->
-    <div class="row">
-        <div class="col-md-12">
-            <a href="{% url 'employee_list' %}" class="btn btn-primary">
-                📋 View All Employees
-            </a>
-        </div>
-    </div>
-
     <!-- EMPLOYEE DASHBOARD -->
     {% else %}
-    
-    <!-- Welcome Section with Employee Info -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card" style="border-left: 5px solid var(--primary-color);">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 200px;">
-                            <h2 style="margin: 0 0 5px 0; color: #1e293b; font-weight: 700;">
-                                Welcome back, {{ employee.user.first_name }}! 👋
-                            </h2>
-                            <p style="margin: 0; color: #64748b; font-size: 0.95rem;">
-                                {{ employee.position }} • {{ employee.department }}
-                            </p>
-                        </div>
-                        <div style="text-align: right; margin-top: 10px;">
-                            <div style="font-size: 2.5rem;">
-                                {{ employee.user.first_name|first|upper }}{{ employee.user.last_name|first|upper }}
-                            </div>
-                            <small style="color: #64748b;">ID: {{ employee.employee_id }}</small>
-                        </div>
-                    </div>
-                </div>
+    <div class="dashboard-header">
+        <div class="d-flex align-items-center mb-4">
+            <div style="font-size: 3rem; margin-right: 20px;">👤</div>
+            <div>
+                <h1>Welcome, {{ employee.user.first_name }}!</h1>
+                <p class="text-muted mb-0">{{ employee.position }} • {{ employee.department }}</p>
             </div>
         </div>
     </div>
 
-    <!-- Key Metrics Cards -->
+    <!-- Employee Status Cards -->
     <div class="row mb-4">
-        <div class="col-md-4 col-sm-6">
-            <div class="metric-card" style="border-left: 4px solid #52c41a;">
-                <div class="metric-icon" style="color: #52c41a;">📅</div>
+        <div class="col-md-4">
+            <div class="glass-card metric-card">
+                <div class="metric-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">📅</div>
                 <div class="metric-label">Today's Status</div>
-                <div class="metric-value" style="color: #52c41a; font-size: 1.5rem;">Present</div>
-                <p style="margin: 8px 0 0 0; font-size: 0.85rem; color: #64748b;">Last check-in: 9:00 AM</p>
+                <div class="metric-value" style="color: #10b981; font-size: 1.5rem;">Present</div>
             </div>
         </div>
-        <div class="col-md-4 col-sm-6">
-            <div class="metric-card" style="border-left: 4px solid #1890ff;">
-                <div class="metric-icon" style="color: #1890ff;">🎯</div>
+        <div class="col-md-4">
+            <div class="glass-card metric-card">
+                <div class="metric-icon" style="background: rgba(30, 144, 255, 0.1); color: #1e90ff;">🎯</div>
                 <div class="metric-label">Remaining Leaves</div>
-                <div class="metric-value" style="color: #1890ff; font-size: 1.5rem;">12</div>
-                <p style="margin: 8px 0 0 0; font-size: 0.85rem; color: #64748b;">Allocated: 20 leaves/year</p>
+                <div class="metric-value" style="color: #1e90ff; font-size: 1.5rem;">12</div>
             </div>
         </div>
-        <div class="col-md-4 col-sm-6">
-            <div class="metric-card" style="border-left: 4px solid #faad14;">
-                <div class="metric-icon" style="color: #faad14;">💼</div>
+        <div class="col-md-4">
+            <div class="glass-card metric-card">
+                <div class="metric-icon" style="background: rgba(250, 173, 20, 0.1); color: #faad14;">💼</div>
                 <div class="metric-label">Status</div>
                 <div class="metric-value" style="color: #faad14; font-size: 1.2rem;">Active</div>
-                <p style="margin: 8px 0 0 0; font-size: 0.85rem; color: #64748b;">Employment active since {{ employee.hire_date|date:"M d, Y" }}</p>
             </div>
         </div>
     </div>
@@ -741,43 +496,27 @@
     <!-- Quick Actions -->
     <div class="row mb-4">
         <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    ⚡ Quick Actions
-                </div>
+            <div class="glass-card">
+                <div class="card-header">⚡ Quick Actions</div>
                 <div class="card-body">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
-                        <a href="{% url 'employee_profile' %}" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-user-circle"></i> View Profile
-                        </a>
-                        <a href="{% url 'employee_request_leave' %}" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-calendar-alt"></i> Request Leave
-                        </a>
-                        <a href="{% url 'employee_attendance' %}" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-clock"></i> Check Attendance
-                        </a>
-                        <a href="{% url 'employee_documents' %}" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-file-alt"></i> View Documents
-                        </a>
-                        <a href="/mobile/check-in/" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-mobile-alt"></i> Mobile Check-in
-                        </a>
-                        <a href="{% url 'employee_salary_slips' %}" class="btn btn-primary" style="padding: 10px; font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-file-invoice-dollar"></i> Salary Slips
-                        </a>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+                        <a href="{% url 'employee_profile' %}" class="btn btn-pro">👤 Profile</a>
+                        <a href="{% url 'employee_request_leave' %}" class="btn btn-pro">📅 Request Leave</a>
+                        <a href="{% url 'employee_attendance' %}" class="btn btn-pro">⏱️ Attendance</a>
+                        <a href="{% url 'employee_documents' %}" class="btn btn-pro">📄 Documents</a>
+                        <a href="/mobile/check-in/" class="btn btn-pro">📱 Check-in</a>
+                        <a href="{% url 'employee_salary_slips' %}" class="btn btn-pro">💼 Salary</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Profile Summary & Recent Updates -->
-    <div class="row mb-4">
+    <!-- Profile & Info -->
+    <div class="row">
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    👤 Profile Summary
-                </div>
+            <div class="glass-card">
+                <div class="card-header">👤 Profile Summary</div>
                 <div class="card-body">
                     <div class="info-item">
                         <span class="info-label">Email</span>
@@ -791,87 +530,39 @@
                         <span class="info-label">Department</span>
                         <span class="info-value">{{ employee.department }}</span>
                     </div>
-                    <div class="info-item">
+                    <div class="info-item" style="border-bottom: none;">
                         <span class="info-label">Position</span>
                         <span class="info-value">{{ employee.position }}</span>
                     </div>
-                    <div class="info-item" style="border-bottom: none;">
-                        <span class="info-label">Employment Status</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="glass-card">
+                <div class="card-header">📋 Employment Details</div>
+                <div class="card-body">
+                    <div class="info-item">
+                        <span class="info-label">Employee ID</span>
+                        <span class="info-value">{{ employee.employee_id }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Hire Date</span>
+                        <span class="info-value">{{ employee.hire_date|date:"M d, Y"|default:"Not provided" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Status</span>
                         <span class="info-value">
                             {% if employee.is_active %}
-                            <span class="badge badge-success">Active</span>
+                            <span class="badge-pro" style="background: #10b981;">Active</span>
                             {% else %}
-                            <span class="badge badge-danger">Inactive</span>
+                            <span class="badge-pro" style="background: #ef4444;">Inactive</span>
                             {% endif %}
                         </span>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    📢 Important Notices
-                </div>
-                <div class="card-body">
-                    {% if employee.is_active %}
-                    <div class="alert alert-success" style="margin-bottom: 10px;">
-                        <i class="fas fa-check-circle"></i> <strong>Active Status</strong><br>
-                        <small>Your account is active and in good standing</small>
-                    </div>
-                    {% else %}
-                    <div class="alert alert-warning" style="margin-bottom: 10px;">
-                        <i class="fas fa-exclamation-circle"></i> <strong>Inactive Account</strong><br>
-                        <small>Please contact HR for more information</small>
-                    </div>
-                    {% endif %}
-                    
-                    <div class="alert alert-info" style="margin-bottom: 0;">
-                        <i class="fas fa-info-circle"></i> <strong>Last Update</strong><br>
-                        <small>Your profile was last updated on {{ employee.hire_date|date:"M d, Y" }}</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Personal Information Section -->
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    📋 Personal Information
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="info-item">
-                                <span class="info-label">Full Name</span>
-                                <span class="info-value">{{ employee.user.first_name }} {{ employee.user.last_name }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Employee ID</span>
-                                <span class="info-value">{{ employee.employee_id }}</span>
-                            </div>
-                            <div class="info-item" style="border-bottom: none;">
-                                <span class="info-label">Date of Birth</span>
-                                <span class="info-value">{{ employee.date_of_birth|date:"M d, Y"|default:"Not provided" }}</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="info-item">
-                                <span class="info-label">Hire Date</span>
-                                <span class="info-value">{{ employee.hire_date|date:"M d, Y"|default:"Not provided" }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Salary</span>
-                                <span class="info-value">{{ employee.salary|default:"Not provided" }}</span>
-                            </div>
-                            <div class="info-item" style="border-bottom: none;">
-                                <span class="info-label">Account Created</span>
-                                <span class="info-value">{{ employee.user.date_joined|date:"M d, Y" }}</span>
-                            </div>
-                        </div>
+                    <div class="info-item" style="border-bottom: none;">
+                        <span class="info-label">Account Created</span>
+                        <span class="info-value">{{ employee.user.date_joined|date:"M d, Y" }}</span>
                     </div>
                 </div>
             </div>

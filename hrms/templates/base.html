@@ -122,6 +122,11 @@
         
         /* Responsive Footer */
         @media (max-width: 768px) {
+            /* Hide navbar toggler on tablet and mobile */
+            .navbar-toggler {
+                display: none;
+            }
+            
             footer {
                 padding: 35px 0 20px 0;
                 margin-top: 50px;
@@ -215,11 +220,10 @@
         .container-main {
             background-color: var(--white);
             border-radius: 0;
-            padding: 10px;
+            padding: 0;
             box-shadow: none;
             margin: 0;
-            border: 1px solid #ddd;
-            border-top: none;
+            border: none;
         }
         
         .container-fluid {
@@ -357,7 +361,7 @@
 
     <!-- Main Content -->
     <div class="main-content" style="margin-top: 61px;">
-        <div class="container-fluid p-0">
+        <div class="container-fluid p-0 m-0">
             <div class="container-main">
                 {% block content %}
                 <!-- Page content goes here -->

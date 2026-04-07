@@ -21,6 +21,7 @@ from employees import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('design/', views.design_template, name='design_template'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.employee_profile, name='employee_profile'),
     path('leave-requests/', views.employee_leave_requests, name='employee_leave_requests'),
@@ -31,6 +32,7 @@ urlpatterns = [
     path('employees/', views.employee_list, name='employee_list'),
     path('employees/<int:pk>/', views.employee_detail, name='employee_detail'),
     path('forgot-password/', views.forgot_password, name='forgot_password'),
+    path('verify-otp/', views.verify_otp, name='verify_otp'),
     path('logout/', LogoutView.as_view(), name='logout'),
     
     # User Management
