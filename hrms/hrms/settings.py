@@ -9,6 +9,11 @@ https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 from pathlib import Path
 import os
+from decouple import config
+
+# Load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +31,7 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,*.railway.app,.railway.app').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,192.168.254.107,10.0.2.2,*.railway.app,.railway.app').split(',')
 
 
 # Application definition
@@ -38,20 +43,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt',
     'employees',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add this for static files
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'employees.middleware.SecurityHeadersMiddleware',  # Custom security headers
+    'employees.middleware.SecurityHeadersMiddleware',
 ]
 
 ROOT_URLCONF = 'hrms.urls'
@@ -146,11 +154,14 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.herokuapp.com',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+    'http://192.168.254.107:8000',  # Local network IP for mobile app
+    'http://10.0.2.2:8000',  # Android emulator host
 ]
 
 # REST Framework Configuration for Mobile API
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -161,6 +172,41 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ],
+}
+
+# JWT Configuration
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # 1 hour
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # 7 days
+    'ROTATE_REFRESH_TOKENS': True,  # Rotate token on each refresh
+    'BLACKLIST_AFTER_ROTATION': True,  # Blacklist old tokens
+    'UPDATE_LAST_LOGIN': True,
+    
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': os.environ.get('DJANGO_SECRET_KEY', SECRET_KEY),
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'JTI_CLAIM': 'jti',
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'JTI_URL': None,
+    
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+    
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
+    
+    'JTI_CLAIM': 'jti',
+    
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=1),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=7),
 }
 
 
@@ -199,3 +245,53 @@ SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 # Disable browser cache for dynamic content
 CACHE_CONTROL_MAX_AGE = 0
+
+# ============================================
+# EMAIL CONFIGURATION (Gmail)
+# ============================================
+# Send password reset emails via Gmail
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = int(config('EMAIL_PORT', default=587))
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default='True') == 'True'
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
+
+# For development, you can use console backend to print emails to console
+if DEBUG:
+    # Uncomment next line to print emails to console instead of sending
+    # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    pass
+
+# ===================== CORS CONFIGURATION FOR MOBILE APP =====================
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://localhost:3000',  # React Native development
+    'http://127.0.0.1:3000',
+]
+
+# Allow all origins in development, restrict in production
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOWED_ORIGINS = [
+        'https://yourdomain.com',
+        'https://*.railway.app',
+        'https://*.herokuapp.com',
+    ]
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]

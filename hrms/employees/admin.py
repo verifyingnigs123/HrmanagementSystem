@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import (
     Role, Employee, Attendance, Department, LeaveType, 
-    LeaveRequest, SalarySlip, Document, AttendancePolicy, AuditLog
+    LeaveRequest, SalarySlip, Document, AttendancePolicy, AuditLog,
+    TwoFactorAuth, SecurityEventLog
 )
 
 # Customize admin site
@@ -197,4 +198,76 @@ class AuditLogAdmin(admin.ModelAdmin):
     
     def has_delete_permission(self, request, obj=None):
         """Prevent deletion of audit logs."""
+        return False
+
+
+@admin.register(TwoFactorAuth)
+class TwoFactorAuthAdmin(admin.ModelAdmin):
+    list_display = ['user', 'is_enabled', 'is_authenticator_enabled', 'is_sms_enabled', 'verified_at']
+    list_filter = ['is_enabled', 'is_authenticator_enabled', 'is_sms_enabled', 'verified_at']
+    search_fields = ['user__username', 'user__email']
+    readonly_fields = ['created_at', 'updated_at', 'secret_key', 'backup_codes']
+    date_hierarchy = 'verified_at'
+    
+    fieldsets = (
+        ('User & Status', {
+            'fields': ('user', 'is_enabled')
+        }),
+        ('Authenticator App', {
+            'fields': ('is_authenticator_enabled', 'secret_key')
+        }),
+        ('SMS 2FA', {
+            'fields': ('is_sms_enabled', 'phone_number')
+        }),
+        ('Recovery', {
+            'fields': ('backup_codes',)
+        }),
+        ('Verification', {
+            'fields': ('verified_at',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        """Prevent manual creation of 2FA records."""
+        return False
+
+
+@admin.register(SecurityEventLog)
+class SecurityEventLogAdmin(admin.ModelAdmin):
+    list_display = ['user', 'event_type', 'severity', 'ip_address', 'is_suspicious', 'created_at']
+    list_filter = ['event_type', 'severity', 'is_suspicious', 'created_at']
+    search_fields = ['user__username', 'description', 'ip_address']
+    readonly_fields = ['user', 'event_type', 'description', 'ip_address', 'user_agent', 'location', 'severity', 'created_at']
+    date_hierarchy = 'created_at'
+    
+    fieldsets = (
+        ('Event Info', {
+            'fields': ('user', 'event_type', 'description')
+        }),
+        ('Severity & Risk', {
+            'fields': ('severity', 'is_suspicious')
+        }),
+        ('Request Details', {
+            'fields': ('ip_address', 'user_agent', 'location')
+        }),
+        ('Timestamp', {
+            'fields': ('created_at',),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        """Prevent manual creation of security event logs."""
+        return False
+    
+    def has_change_permission(self, request, obj=None):
+        """Prevent editing of security event logs."""
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        """Prevent deletion of security event logs."""
         return False

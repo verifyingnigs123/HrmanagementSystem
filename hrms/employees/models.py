@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+import pyotp
+import secrets
 
 # Role choices
 ROLE_CHOICES = [
@@ -274,3 +276,128 @@ class AuditLog(models.Model):
     
     def __str__(self):
         return f"{self.user} - {self.action} on {self.model_name} at {self.created_at}"
+
+
+# Two-Factor Authentication (2FA) Model using TOTP
+class TwoFactorAuth(models.Model):
+    """
+    Model for managing user's Two-Factor Authentication settings.
+    Uses Time-based One-Time Password (TOTP) algorithm.
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='two_factor_auth')
+    is_enabled = models.BooleanField(default=False, help_text="Is 2FA currently enabled for this user")
+    secret_key = models.CharField(max_length=255, blank=True, help_text="Secret key for TOTP")
+    backup_codes = models.JSONField(default=list, blank=True, help_text="List of backup codes")
+    phone_number = models.CharField(max_length=20, blank=True, help_text="Phone number for SMS 2FA")
+    is_sms_enabled = models.BooleanField(default=False, help_text="Is SMS-based 2FA enabled")
+    is_authenticator_enabled = models.BooleanField(default=False, help_text="Is authenticator app 2FA enabled")
+    verified_at = models.DateTimeField(null=True, blank=True, help_text="When 2FA was last verified")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Two Factor Authentication"
+        verbose_name_plural = "Two Factor Authentications"
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"2FA for {self.user.username} - {'Enabled' if self.is_enabled else 'Disabled'}"
+    
+    def generate_secret_key(self):
+        """Generate a new TOTP secret key."""
+        self.secret_key = pyotp.random_base32()
+        return self.secret_key
+    
+    def get_totp_uri(self, issuer_name='HRMS'):
+        """
+        Get the TOTP URI for QR code generation.
+        returns: URI string for QR code
+        """
+        if not self.secret_key:
+            self.generate_secret_key()
+            self.save()
+        
+        totp = pyotp.TOTP(self.secret_key)
+        return totp.provisioning_uri(
+            name=self.user.email or self.user.username,
+            issuer_name=issuer_name
+        )
+    
+    def generate_backup_codes(self, count=10):
+        """Generate backup codes for account recovery."""
+        codes = [secrets.token_hex(4).upper() for _ in range(count)]
+        self.backup_codes = codes
+        return codes
+    
+    def verify_token(self, token):
+        """
+        Verify a 6-digit TOTP token.
+        Returns: True if valid, False otherwise
+        """
+        if not self.secret_key:
+            return False
+        
+        totp = pyotp.TOTP(self.secret_key)
+        # Allow for time drift (±1 interval)
+        return totp.verify(token, valid_window=1)
+    
+    def use_backup_code(self, code):
+        """
+        Use a backup code. 
+        Returns: True if code was valid and removed, False otherwise
+        """
+        if code in self.backup_codes:
+            self.backup_codes.remove(code)
+            self.save()
+            return True
+        return False
+
+
+# Security Event Log Model
+class SecurityEventLog(models.Model):
+    """
+    Log security-related events: login attempts, failed auth, OTP verification, etc.
+    """
+    EVENT_TYPES = [
+        ('login_success', 'Successful Login'),
+        ('login_failed', 'Failed Login Attempt'),
+        ('password_change', 'Password Changed'),
+        ('password_reset', 'Password Reset'),
+        ('2fa_enabled', '2FA Enabled'),
+        ('2fa_disabled', '2FA Disabled'),
+        ('2fa_verified', '2FA Verification Success'),
+        ('2fa_failed', 'Failed 2FA Attempt'),
+        ('backup_code_used', 'Backup Code Used'),
+        ('session_created', 'Session Created'),
+        ('session_expired', 'Session Expired'),
+        ('permission_denied', 'Permission Denied'),
+        ('api_key_created', 'API Key Created'),
+        ('api_key_revoked', 'API Key Revoked'),
+        ('suspicious_activity', 'Suspicious Activity Detected'),
+        ('logout', 'Logout'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='security_events')
+    event_type = models.CharField(max_length=30, choices=EVENT_TYPES)
+    description = models.TextField(blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+    location = models.CharField(max_length=255, blank=True, help_text="Approximate location from IP")
+    is_suspicious = models.BooleanField(default=False)
+    severity = models.CharField(
+        max_length=10,
+        choices=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High'), ('critical', 'Critical')],
+        default='low'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'created_at']),
+            models.Index(fields=['event_type', 'created_at']),
+            models.Index(fields=['is_suspicious']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user} - {self.event_type} at {self.created_at}"
